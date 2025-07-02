@@ -58,7 +58,7 @@ export const useAuthStore = defineStore('auth', {
         this.isLoading = true
         const { $api } = useNuxtApp()
         
-        const response = await $api.post<AuthResponse>('/auth/login', credentials)
+        const response = await $api.post<AuthResponse>('/api/v1/auth/login', credentials)
         
         if (response.success) {
           this.setAuth(response.data.user, response.data.access_token)
@@ -87,7 +87,7 @@ export const useAuthStore = defineStore('auth', {
         this.isLoading = true
         const { $api } = useNuxtApp()
         
-        const response = await $api.post<AuthResponse>('/auth/register', userData)
+        const response = await $api.post<AuthResponse>('/api/v1/auth/register', userData)
         
         if (response.success) {
           return { 
@@ -106,8 +106,8 @@ export const useAuthStore = defineStore('auth', {
 
     async logout() {
       try {
-        const { $api } = useNuxtApp()
-        await $api.post('/auth/logout')
+        // Note: L'API ne semble pas avoir d'endpoint de logout, donc on nettoie juste localement
+        console.log('Déconnexion locale')
       } catch (error) {
         console.error('Erreur lors de la déconnexion:', error)
       } finally {
@@ -119,7 +119,7 @@ export const useAuthStore = defineStore('auth', {
     async forgotPassword(email: string) {
       try {
         const { $api } = useNuxtApp()
-        await $api.post('/auth/forgot-password', { email })
+        await $api.post('/api/v1/auth/forgot-password', { email })
         return { success: true, message: 'Un email de réinitialisation a été envoyé.' }
       } catch (error: any) {
         const apiError = error as ApiError
@@ -131,7 +131,7 @@ export const useAuthStore = defineStore('auth', {
     async resetPassword(token: string, password: string) {
       try {
         const { $api } = useNuxtApp()
-        await $api.post('/auth/reset-password', { token, password })
+        await $api.post('/api/v1/auth/reset-password', { token, password })
         return { success: true, message: 'Mot de passe réinitialisé avec succès.' }
       } catch (error: any) {
         const apiError = error as ApiError
@@ -143,7 +143,7 @@ export const useAuthStore = defineStore('auth', {
     async verifyEmail(token: string) {
       try {
         const { $api } = useNuxtApp()
-        await $api.post('/auth/verify-email', { token })
+        await $api.post('/api/v1/auth/verify-email', { token })
         
         if (this.user) {
           this.user.isVerified = true
@@ -161,7 +161,7 @@ export const useAuthStore = defineStore('auth', {
     async resendVerificationEmail() {
       try {
         const { $api } = useNuxtApp()
-        await $api.post('/auth/resend-verification')
+        await $api.post('/api/v1/auth/resend-verification')
         return { success: true, message: 'Email de vérification renvoyé.' }
       } catch (error: any) {
         const apiError = error as ApiError
@@ -175,7 +175,7 @@ export const useAuthStore = defineStore('auth', {
         this.isLoading = true
         const { $api } = useNuxtApp()
         
-        const response = await $api.put<{ user: User }>('/users/profile', profileData)
+        const response = await $api.put<{ user: User }>('/api/v1/users/profile', profileData)
         
         this.user = response.user
         return { success: true, message: 'Profil mis à jour avec succès.' }
@@ -191,7 +191,7 @@ export const useAuthStore = defineStore('auth', {
     async changePassword(currentPassword: string, newPassword: string) {
       try {
         const { $api } = useNuxtApp()
-        await $api.post('/users/change-password', { currentPassword, newPassword })
+        await $api.post('/api/v1/users/change-password', { currentPassword, newPassword })
         return { success: true, message: 'Mot de passe modifié avec succès.' }
       } catch (error: any) {
         const apiError = error as ApiError
@@ -203,7 +203,7 @@ export const useAuthStore = defineStore('auth', {
     async refreshToken() {
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.post<AuthResponse>('/auth/refresh')
+        const response = await $api.post<AuthResponse>('/api/v1/auth/refresh')
         
         if (response.success) {
           this.setAuth(response.data.user, response.data.access_token)
@@ -260,7 +260,7 @@ export const useAuthStore = defineStore('auth', {
           const { $api } = useNuxtApp()
           $api.setAuthToken(token)
           
-          const response = await $api.get<{ user: User }>('/users/profile')
+          const response = await $api.get<{ user: User }>('/api/v1/users/me')
           
           this.setAuth(response.user, token)
         } catch (error) {

@@ -101,7 +101,7 @@ export const useTagsStore = defineStore('tags', {
       try {
         const { $api } = useNuxtApp()
         
-        const response = await $api.get<PaginatedResponse<Tag>>('/tags', {
+        const response = await $api.get<PaginatedResponse<Tag>>('/api/v1/tags', {
           page,
           limit,
           ...Object.fromEntries(
@@ -131,10 +131,14 @@ export const useTagsStore = defineStore('tags', {
 
     async fetchPopularTags(limit = 20) {
       try {
+        // L'API ne semble pas avoir d'endpoint spécifique pour les tags populaires
+        // Utilisons l'endpoint général et trions par usageCount
         const { $api } = useNuxtApp()
-        const response = await $api.get<ApiResponse<Tag[]>>(`/tags/popular?limit=${limit}`)
+        const response = await $api.get<{ data: Tag[] }>('/api/v1/tags')
         
         this.popularTags = response.data
+          .sort((a, b) => (b.usageCount || 0) - (a.usageCount || 0))
+          .slice(0, limit)
         
         // Update cache
         response.data.forEach(tag => {
@@ -156,7 +160,7 @@ export const useTagsStore = defineStore('tags', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.get<ApiResponse<Tag>>(`/tags/${id}`)
+        const response = await $api.get<ApiResponse<Tag>>(`/api/v1/tags/${id}`)
         
         this.currentTag = response.data
         this.cache.set(id, response.data)
@@ -175,15 +179,13 @@ export const useTagsStore = defineStore('tags', {
       if (!query || query.length < 2) return []
 
       try {
-        const { $api } = useNuxtApp()
-        const response = await $api.get<ApiResponse<Tag[]>>(`/tags/search?q=${encodeURIComponent(query)}`)
-        
-        // Update cache
-        response.data.forEach(tag => {
-          this.cache.set(tag.id, tag)
-        })
-        
-        return response.data
+        // L'API ne semble pas avoir d'endpoint de recherche spécifique
+        // Utilisons la recherche locale sur les tags déjà chargés
+        const lowerQuery = query.toLowerCase()
+        return this.tags
+          .filter(tag => tag.name.toLowerCase().includes(lowerQuery))
+          .sort((a, b) => (b.usageCount || 0) - (a.usageCount || 0))
+          .slice(0, 10)
       } catch (error: any) {
         console.error('Error searching tags:', error)
         return []
@@ -196,10 +198,7 @@ export const useTagsStore = defineStore('tags', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.get<ApiResponse<Tag>>('/tags', {
-          method: 'POST',
-          body: tagData
-        })
+        const response = await $api.post<ApiResponse<Tag>>('/api/v1/tags', tagData)
 
         const newTag = response.data
         this.tags.unshift(newTag)
@@ -230,10 +229,7 @@ export const useTagsStore = defineStore('tags', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.get<ApiResponse<Tag>>(`/tags/${id}`, {
-          method: 'PATCH',
-          body: updateData
-        })
+        const response = await $api.patch<ApiResponse<Tag>>(`/api/v1/tags/${id}`, updateData)
 
         const updatedTag = response.data
         
@@ -273,7 +269,7 @@ export const useTagsStore = defineStore('tags', {
 
       try {
         const { $api } = useNuxtApp()
-        await $api.delete('/tags/${id}')
+        await $api.delete(`/api/v1/tags/${id}`)
 
         // Remove from list
         this.tags = this.tags.filter(t => t.id !== id)
@@ -311,13 +307,9 @@ export const useTagsStore = defineStore('tags', {
       if (!content || content.length < 10) return []
 
       try {
-        const { $api } = useNuxtApp()
-        const response = await $api.get<ApiResponse<Tag[]>>('/tags/suggest', {
-          method: 'POST',
-          body: { content }
-        })
-        
-        return response.data
+        // L'API ne semble pas avoir d'endpoint de suggestion de tags
+        // Retournons une liste vide pour l'instant
+        return []
       } catch (error: any) {
         console.error('Error getting tag suggestions:', error)
         return []

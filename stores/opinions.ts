@@ -73,7 +73,7 @@ export const useOpinionsStore = defineStore('opinions', {
         this.isLoading = true
         const { $api } = useNuxtApp()
 
-        const response = await $api.get<PaginatedResponse<Opinion>>('/opinions', {
+        const response = await $api.get<PaginatedResponse<Opinion>>('/api/v1/opinions', {
           page: this.pagination.page,
           limit: this.pagination.limit,
           ...params
@@ -107,7 +107,7 @@ export const useOpinionsStore = defineStore('opinions', {
         this.isLoading = true
         const { $api } = useNuxtApp()
 
-        const response = await $api.get<{ opinion: Opinion }>(`/opinions/${id}`)
+        const response = await $api.get<{ opinion: Opinion }>(`/api/v1/opinions/${id}`)
 
         this.currentOpinion = response.opinion
         this.cache[id] = response.opinion
@@ -125,7 +125,7 @@ export const useOpinionsStore = defineStore('opinions', {
         this.isCreating = true
         const { $api } = useNuxtApp()
 
-        const response = await $api.post<{ opinion: Opinion }>('/opinions', opinionData)
+        const response = await $api.post<{ opinion: Opinion }>('/api/v1/opinions', opinionData)
 
         const newOpinion = response.opinion
         this.opinions.unshift(newOpinion)
@@ -144,7 +144,7 @@ export const useOpinionsStore = defineStore('opinions', {
         this.isUpdating = true
         const { $api } = useNuxtApp()
 
-        const response = await $api.put<{ opinion: Opinion }>(`/opinions/${id}`, opinionData)
+        const response = await $api.put<{ opinion: Opinion }>(`/api/v1/opinions/${id}`, opinionData)
 
         const updatedOpinion = response.opinion
         
@@ -173,7 +173,7 @@ export const useOpinionsStore = defineStore('opinions', {
       try {
         const { $api } = useNuxtApp()
 
-        await $api.delete(`/opinions/${id}`)
+        await $api.delete(`/api/v1/opinions/${id}`)
 
         // Supprimer de la liste, du cache et réinitialiser si c'est l'avis courant
         this.opinions = this.opinions.filter(opinion => opinion.id !== id)
@@ -191,7 +191,7 @@ export const useOpinionsStore = defineStore('opinions', {
       try {
         const { $api } = useNuxtApp()
 
-        const response = await $api.post<{ liked: boolean; likesCount: number }>(`/opinions/${id}/like`)
+        const response = await $api.post<{ liked: boolean; likesCount: number }>(`/api/v1/opinions/${id}/like`)
 
         const { liked, likesCount } = response
         
@@ -229,7 +229,7 @@ export const useOpinionsStore = defineStore('opinions', {
         this.isLoading = true
         const { $api } = useNuxtApp()
 
-        const response = await $api.get<PaginatedResponse<Opinion>>('/opinions', {
+        const response = await $api.get<PaginatedResponse<Opinion>>('/api/v1/opinions', {
           page: nextPage,
           limit: this.pagination.limit,
           ...this.filters

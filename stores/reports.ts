@@ -104,7 +104,7 @@ export const useReportsStore = defineStore('reports', {
       try {
         const { $api } = useNuxtApp()
         
-        const response = await $api.get<PaginatedResponse<Report>>('/reports', {
+        const response = await $api.get<PaginatedResponse<Report>>('/api/v1/reports', {
           page,
           limit,
           ...Object.fromEntries(
@@ -143,7 +143,7 @@ export const useReportsStore = defineStore('reports', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.get<ApiResponse<Report>>(`/reports/${id}`)
+        const response = await $api.get<ApiResponse<Report>>(`/api/v1/reports/${id}`)
         
         this.currentReport = response.data
         this.cache.set(id, response.data)
@@ -164,10 +164,7 @@ export const useReportsStore = defineStore('reports', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.get<ApiResponse<Report>>('/reports', {
-          method: 'POST',
-          body: reportData
-        })
+        const response = await $api.post<ApiResponse<Report>>('/api/v1/reports', reportData)
 
         const newReport = response.data
         this.reports.unshift(newReport)
@@ -198,10 +195,7 @@ export const useReportsStore = defineStore('reports', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.get<ApiResponse<Report>>(`/reports/${id}`, {
-          method: 'PATCH',
-          body: updateData
-        })
+        const response = await $api.patch<ApiResponse<Report>>(`/api/v1/reports/${id}`, updateData)
 
         const updatedReport = response.data
         
@@ -235,7 +229,7 @@ export const useReportsStore = defineStore('reports', {
 
       try {
         const { $api } = useNuxtApp()
-        await $api.delete('/reports/${id}')
+        await $api.delete(`/api/v1/reports/${id}`)
 
         // Remove from list
         this.reports = this.reports.filter(r => r.id !== id)
@@ -260,6 +254,74 @@ export const useReportsStore = defineStore('reports', {
       } catch (error: any) {
         this.error = error.message || 'Erreur lors de la suppression du signalement'
         console.error('Error deleting report:', error)
+        throw error
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async assignReport(id: string, assignData: any) {
+      this.loading = true
+      this.error = null
+
+      try {
+        const { $api } = useNuxtApp()
+        const response = await $api.post<ApiResponse<Report>>(`/api/v1/reports/${id}/assign`, assignData)
+
+        const updatedReport = response.data
+        
+        // Update in list
+        const index = this.reports.findIndex(r => r.id === id)
+        if (index !== -1) {
+          this.reports[index] = updatedReport
+        }
+
+        // Update cache
+        this.cache.set(id, updatedReport)
+
+        // Update current if it's the same
+        if (this.currentReport?.id === id) {
+          this.currentReport = updatedReport
+        }
+
+        return updatedReport
+      } catch (error: any) {
+        this.error = error.message || 'Erreur lors de l\'assignation du signalement'
+        console.error('Error assigning report:', error)
+        throw error
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async addStatusUpdate(id: string, updateData: any) {
+      this.loading = true
+      this.error = null
+
+      try {
+        const { $api } = useNuxtApp()
+        const response = await $api.post<ApiResponse<Report>>(`/api/v1/reports/${id}/update`, updateData)
+
+        const updatedReport = response.data
+        
+        // Update in list
+        const index = this.reports.findIndex(r => r.id === id)
+        if (index !== -1) {
+          this.reports[index] = updatedReport
+        }
+
+        // Update cache
+        this.cache.set(id, updatedReport)
+
+        // Update current if it's the same
+        if (this.currentReport?.id === id) {
+          this.currentReport = updatedReport
+        }
+
+        return updatedReport
+      } catch (error: any) {
+        this.error = error.message || 'Erreur lors de la mise à jour du statut'
+        console.error('Error adding status update:', error)
         throw error
       } finally {
         this.loading = false

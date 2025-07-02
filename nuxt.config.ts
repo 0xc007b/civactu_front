@@ -1,7 +1,14 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+import tailwindcss from "@tailwindcss/vite";
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
+
+  vite: {
+    plugins: [
+      tailwindcss(),
+    ],
+  },
 
   modules: [
     '@nuxt/eslint',
@@ -109,7 +116,7 @@ export default defineNuxtConfig({
   },
   
   // CSS Framework
-  // css: ['~/assets/css/main.css'],
+  css: ['~/assets/css/main.css'],
   
   // SSR Configuration
   ssr: true

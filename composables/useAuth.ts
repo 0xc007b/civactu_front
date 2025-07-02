@@ -32,7 +32,7 @@ export const useAuth = () => {
     try {
       isLoading.value = true
       
-      const response = await post('/auth/login', credentials)
+      const response = await post('/api/v1/auth/login', credentials)
       
       if (response.success) {
         const { user: userData, access_token } = response.data as any
@@ -58,7 +58,7 @@ export const useAuth = () => {
     try {
       isLoading.value = true
       
-      const response = await post('/auth/register', userData)
+      const response = await post('/api/v1/auth/register', userData)
       
       if (response.success) {
         return { 
@@ -75,7 +75,8 @@ export const useAuth = () => {
 
   const logout = async () => {
     try {
-      await post('/auth/logout')
+      // Note: L'API ne semble pas avoir d'endpoint de logout, donc on nettoie juste localement
+      console.log('Déconnexion locale')
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error)
     } finally {
@@ -91,7 +92,7 @@ export const useAuth = () => {
 
   const forgotPassword = async (email: string) => {
     try {
-      await post('/auth/forgot-password', { email })
+      await post('/api/v1/auth/forgot-password', { email })
       return { success: true, message: 'Un email de réinitialisation a été envoyé.' }
     } catch (error: any) {
       throw new Error(error.message || 'Erreur lors de l\'envoi')
@@ -100,7 +101,7 @@ export const useAuth = () => {
 
   const resetPassword = async (token: string, password: string) => {
     try {
-      await post('/auth/reset-password', { token, password })
+      await post('/api/v1/auth/reset-password', { token, password })
       return { success: true, message: 'Mot de passe réinitialisé avec succès.' }
     } catch (error: any) {
       throw new Error(error.message || 'Erreur de réinitialisation')
@@ -109,7 +110,7 @@ export const useAuth = () => {
 
   const verifyEmail = async (verificationToken: string) => {
     try {
-      await post('/auth/verify-email', { token: verificationToken })
+      await post('/api/v1/auth/verify-email', { token: verificationToken })
       
       if (user.value) {
         user.value.isVerified = true
@@ -121,9 +122,18 @@ export const useAuth = () => {
     }
   }
 
+  const resendVerification = async () => {
+    try {
+      await post('/api/v1/auth/resend-verification')
+      return { success: true, message: 'Email de vérification renvoyé.' }
+    } catch (error: any) {
+      throw new Error(error.message || 'Erreur lors du renvoi')
+    }
+  }
+
   const refreshToken = async () => {
     try {
-      const response = await post('/auth/refresh')
+      const response = await post('/api/v1/auth/refresh')
       
       if (response.success) {
         const { user: userData, access_token } = response.data as any
@@ -144,10 +154,10 @@ export const useAuth = () => {
   const initializeAuth = async () => {
     if (token.value) {
       try {
-        const response = await get('/users/profile')
+        const response = await get('/api/v1/users/me')
         
         if (response.success) {
-          user.value = (response.data as any).user
+          user.value = response.data as User
           isAuthenticated.value = true
         } else {
           // Token invalide, nettoyer
@@ -214,6 +224,7 @@ export const useAuth = () => {
     forgotPassword,
     resetPassword,
     verifyEmail,
+    resendVerification,
     refreshToken,
     initializeAuth,
     
