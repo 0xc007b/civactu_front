@@ -136,7 +136,7 @@ export const useSearch = <T = any>() => {
         totalPages: number
       }>(`${endpoint}`, Object.fromEntries(params))
 
-      results.value = [...results.value, ...response.data]
+      results.value = [...(results.value as T[]), ...(response.data as T[])]
       currentPage.value = response.page
       hasMore.value = (response.page * response.limit) < response.total
 
@@ -250,7 +250,7 @@ export const useSearch = <T = any>() => {
 
     try {
       const response = await $api.get<{ data: string[] }>(
-        `${endpoint}/suggestions`, { q: partialQuery, limit: limit.toString() }
+        `${endpoint}/suggestions`, { q: partialQuery, limit }
       )
       return response.data
     } catch (err) {

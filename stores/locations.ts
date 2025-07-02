@@ -75,6 +75,11 @@ export const useLocationsStore = defineStore('locations', {
       // Sort by distance if user location is available
       if (state.userLocation && state.filters.centerLat && state.filters.centerLng) {
         filtered.sort((a, b) => {
+          // Only calculate distance if both locations have coordinates
+          if (a.latitude == null || a.longitude == null || b.latitude == null || b.longitude == null) {
+            return 0
+          }
+          
           const distanceA = calculateDistance(
             state.filters.centerLat!,
             state.filters.centerLng!,
@@ -96,8 +101,9 @@ export const useLocationsStore = defineStore('locations', {
 
     locationsByType: (state) => {
       return state.locations.reduce((acc, location) => {
-        acc[location.type] = (acc[location.type] || [])
-        acc[location.type].push(location)
+        const type = location.type || 'other'
+        acc[type] = (acc[type] || [])
+        acc[type].push(location)
         return acc
       }, {} as Record<string, Location[]>)
     },
@@ -141,7 +147,7 @@ export const useLocationsStore = defineStore('locations', {
           )
         })
 
-        const response = await $api<PaginatedResponse<Location>>(`/locations?${params}`)
+        const response = await $api.get<PaginatedResponse<Location>>('/locations', params)
 
         if (page === 1 || refresh) {
           this.locations = response.data
@@ -150,16 +156,11 @@ export const useLocationsStore = defineStore('locations', {
         }
 
         // Update cache
-        response.data.forEach(location => {
+        response.data.forEach((location: Location) => {
           this.cache.set(location.id, location)
         })
 
-        this.pagination = {
-          page: response.page,
-          limit: response.limit,
-          total: response.total,
-          totalPages: response.totalPages
-        }
+        this.pagination = response.meta.pagination
       } catch (error: any) {
         this.error = error.message || 'Erreur lors du chargement des lieux'
         console.error('Error fetching locations:', error)
@@ -179,7 +180,7 @@ export const useLocationsStore = defineStore('locations', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<Location>>(`/locations/${id}`)
+        const response = await $api.get<ApiResponse<Location>>(`/locations/${id}`)
         
         this.currentLocation = response.data
         this.cache.set(id, response.data)
@@ -199,10 +200,10 @@ export const useLocationsStore = defineStore('locations', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<Location[]>>(`/locations/search?q=${encodeURIComponent(query)}&limit=${limit}`)
+        const response = await $api.get<ApiResponse<Location[]>>('/locations/search', { q: query, limit })
         
         // Update cache
-        response.data.forEach(location => {
+        response.data.forEach((location: Location) => {
           this.cache.set(location.id, location)
         })
         
@@ -226,12 +227,12 @@ export const useLocationsStore = defineStore('locations', {
           limit: limit.toString()
         })
 
-        const response = await $api<ApiResponse<Location[]>>(`/locations/nearby?${params}`)
+        const response = await $api.get<ApiResponse<Location[]>>('/locations/nearby', { latitude, longitude, radius })
         
         this.nearbyLocations = response.data
         
         // Update cache
-        response.data.forEach(location => {
+        response.data.forEach((location: Location) => {
           this.cache.set(location.id, location)
         })
         
@@ -250,10 +251,7 @@ export const useLocationsStore = defineStore('locations', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<Location>>('/locations', {
-          method: 'POST',
-          body: locationData
-        })
+        const response = await $api.post<ApiResponse<Location>>('/locations', locationData)
 
         const newLocation = response.data
         this.locations.unshift(newLocation)
@@ -284,10 +282,7 @@ export const useLocationsStore = defineStore('locations', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<Location>>(`/locations/${id}`, {
-          method: 'PATCH',
-          body: updateData
-        })
+        const response = await $api.put<ApiResponse<Location>>(`/locations/${id}`, updateData)
 
         const updatedLocation = response.data
         
@@ -327,7 +322,7 @@ export const useLocationsStore = defineStore('locations', {
 
       try {
         const { $api } = useNuxtApp()
-        await $api(`/locations/${id}`, { method: 'DELETE' })
+        await $api.delete(`/locations/${id}`)
 
         // Remove from list
         this.locations = this.locations.filter(l => l.id !== id)

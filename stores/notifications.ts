@@ -79,15 +79,13 @@ export const useNotificationsStore = defineStore('notifications', {
       try {
         const { $api } = useNuxtApp()
         
-        const params = new URLSearchParams({
-          page: page.toString(),
-          limit: limit.toString(),
+        const response = await $api.get<PaginatedResponse<Notification>>('/notifications', {
+          page,
+          limit,
           ...Object.fromEntries(
             Object.entries(this.filters).filter(([_, value]) => value !== undefined && value !== '')
           )
         })
-
-        const response = await $api<PaginatedResponse<Notification>>(`/notifications?${params}`)
 
         if (page === 1 || refresh) {
           this.notifications = response.data
@@ -95,12 +93,7 @@ export const useNotificationsStore = defineStore('notifications', {
           this.notifications.push(...response.data)
         }
 
-        this.pagination = {
-          page: response.page,
-          limit: response.limit,
-          total: response.total,
-          totalPages: response.totalPages
-        }
+        this.pagination = response.meta.pagination
 
         this.updateUnreadCount()
       } catch (error: any) {
@@ -114,7 +107,7 @@ export const useNotificationsStore = defineStore('notifications', {
     async markAsRead(notificationId: string) {
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<Notification>>(`/notifications/${notificationId}/read`, {
+        const response = await $api.get<ApiResponse<Notification>>(`/notifications/${notificationId}/read`, {
           method: 'PATCH'
         })
 
@@ -141,9 +134,7 @@ export const useNotificationsStore = defineStore('notifications', {
 
       try {
         const { $api } = useNuxtApp()
-        await $api('/notifications/mark-all-read', {
-          method: 'PATCH'
-        })
+        await $api.patch('/notifications/mark-all-read', {})
 
         // Update all notifications as read
         this.notifications.forEach(notification => {
@@ -175,7 +166,7 @@ export const useNotificationsStore = defineStore('notifications', {
 
       try {
         const { $api } = useNuxtApp()
-        await $api(`/notifications/${notificationId}`, { method: 'DELETE' })
+        await $api.delete(`/notifications/${notificationId}`)
 
         // Remove from notifications list
         this.notifications = this.notifications.filter(n => n.id !== notificationId)
@@ -205,7 +196,7 @@ export const useNotificationsStore = defineStore('notifications', {
 
       try {
         const { $api } = useNuxtApp()
-        await $api('/notifications/delete-read', { method: 'DELETE' })
+        await $api.delete('/notifications/delete-read')
 
         // Remove read notifications from the list
         const beforeCount = this.notifications.length
@@ -233,7 +224,7 @@ export const useNotificationsStore = defineStore('notifications', {
     async fetchUnreadCount() {
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<{ count: number }>>('/notifications/unread/count')
+        const response = await $api.get<ApiResponse<{ count: number }>>('/notifications/unread/count')
         this.unreadCount = response.data.count
       } catch (error: any) {
         console.error('Error fetching unread count:', error)

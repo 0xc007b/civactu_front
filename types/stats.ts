@@ -29,10 +29,10 @@ export interface PublicStats {
   totalMessages: number
   resolutionRate: number
   averageResolutionTime: number
-  opinionsCount?: number
-  usersCount?: number
-  commentsCount?: number
-  averageRating?: number
+  opinionsCount: number
+  usersCount: number
+  commentsCount: number
+  averageRating: number
 }
 
 export interface DashboardData {

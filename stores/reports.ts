@@ -87,7 +87,8 @@ export const useReportsStore = defineStore('reports', {
 
     reportsByType: (state) => {
       return state.reports.reduce((acc, report) => {
-        acc[report.type] = (acc[report.type] || 0) + 1
+        const category = report.category || 'OTHER'
+        acc[category] = (acc[category] || 0) + 1
         return acc
       }, {} as Record<string, number>)
     }
@@ -103,15 +104,13 @@ export const useReportsStore = defineStore('reports', {
       try {
         const { $api } = useNuxtApp()
         
-        const params = new URLSearchParams({
-          page: page.toString(),
-          limit: limit.toString(),
+        const response = await $api.get<PaginatedResponse<Report>>('/reports', {
+          page,
+          limit,
           ...Object.fromEntries(
             Object.entries(this.filters).filter(([_, value]) => value !== undefined && value !== '')
           )
         })
-
-        const response = await $api<PaginatedResponse<Report>>(`/reports?${params}`)
 
         if (page === 1 || refresh) {
           this.reports = response.data
@@ -124,12 +123,7 @@ export const useReportsStore = defineStore('reports', {
           this.cache.set(report.id, report)
         })
 
-        this.pagination = {
-          page: response.page,
-          limit: response.limit,
-          total: response.total,
-          totalPages: response.totalPages
-        }
+        this.pagination = response.meta.pagination
       } catch (error: any) {
         this.error = error.message || 'Erreur lors du chargement des signalements'
         console.error('Error fetching reports:', error)
@@ -149,7 +143,7 @@ export const useReportsStore = defineStore('reports', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<Report>>(`/reports/${id}`)
+        const response = await $api.get<ApiResponse<Report>>(`/reports/${id}`)
         
         this.currentReport = response.data
         this.cache.set(id, response.data)
@@ -170,7 +164,7 @@ export const useReportsStore = defineStore('reports', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<Report>>('/reports', {
+        const response = await $api.get<ApiResponse<Report>>('/reports', {
           method: 'POST',
           body: reportData
         })
@@ -204,7 +198,7 @@ export const useReportsStore = defineStore('reports', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<Report>>(`/reports/${id}`, {
+        const response = await $api.get<ApiResponse<Report>>(`/reports/${id}`, {
           method: 'PATCH',
           body: updateData
         })
@@ -241,7 +235,7 @@ export const useReportsStore = defineStore('reports', {
 
       try {
         const { $api } = useNuxtApp()
-        await $api(`/reports/${id}`, { method: 'DELETE' })
+        await $api.delete('/reports/${id}')
 
         // Remove from list
         this.reports = this.reports.filter(r => r.id !== id)

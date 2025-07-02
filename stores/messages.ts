@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import type { Message, MessageCreateInput, MessageUpdateInput, PaginatedResponse, ApiResponse } from '~/types'
+import type { Message, MessageCreateInput, MessageUpdateInput, MessageFilters } from '~/types/message'
+import type { PaginatedResponse, ApiResponse } from '~/types/api'
 
 interface MessagesState {
   messages: Message[]
@@ -13,12 +14,7 @@ interface MessagesState {
     total: number
     totalPages: number
   }
-  filters: {
-    senderId?: string
-    recipientId?: string
-    status?: 'SENT' | 'DELIVERED' | 'READ'
-    search?: string
-  }
+  filters: MessageFilters
   unreadCount: number
 }
 
@@ -105,15 +101,13 @@ export const useMessagesStore = defineStore('messages', {
       try {
         const { $api } = useNuxtApp()
         
-        const params = new URLSearchParams({
-          page: page.toString(),
-          limit: limit.toString(),
+        const response = await $api.get<PaginatedResponse<Message>>('/messages', {
+          page,
+          limit,
           ...Object.fromEntries(
             Object.entries(this.filters).filter(([_, value]) => value !== undefined && value !== '')
           )
         })
-
-        const response = await $api<PaginatedResponse<Message>>(`/messages?${params}`)
 
         if (page === 1 || refresh) {
           this.messages = response.data
@@ -121,12 +115,7 @@ export const useMessagesStore = defineStore('messages', {
           this.messages.push(...response.data)
         }
 
-        this.pagination = {
-          page: response.page,
-          limit: response.limit,
-          total: response.total,
-          totalPages: response.totalPages
-        }
+        this.pagination = response.meta.pagination
 
         // Update unread count
         this.updateUnreadCount()
@@ -145,14 +134,12 @@ export const useMessagesStore = defineStore('messages', {
       try {
         const { $api } = useNuxtApp()
         
-        const params = new URLSearchParams({
-          page: page.toString(),
-          limit: limit.toString()
+        const response = await $api.get<PaginatedResponse<Message>>(`/messages/conversation/${userId}`, {
+          page,
+          limit
         })
-
-        const response = await $api<PaginatedResponse<Message>>(`/messages/conversation/${userId}?${params}`)
         
-        this.conversations[userId] = response.data.sort((a, b) => 
+        this.conversations[userId] = response.data.sort((a: Message, b: Message) => 
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         )
 
@@ -172,16 +159,13 @@ export const useMessagesStore = defineStore('messages', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<Message>>('/messages', {
-          method: 'POST',
-          body: messageData
-        })
+        const response = await $api.post<ApiResponse<Message>>('/messages', messageData)
 
         const newMessage = response.data
         this.messages.unshift(newMessage)
 
         // Add to conversation
-        const otherUserId = newMessage.receiverId
+        const otherUserId = newMessage.recipientId
         if (!this.conversations[otherUserId]) {
           this.conversations[otherUserId] = []
         }
@@ -202,9 +186,7 @@ export const useMessagesStore = defineStore('messages', {
     async markAsRead(messageId: string) {
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<Message>>(`/messages/${messageId}/read`, {
-          method: 'PATCH'
-        })
+        const response = await $api.patch<ApiResponse<Message>>(`/messages/${messageId}/read`, {})
 
         const updatedMessage = response.data
         
@@ -237,7 +219,7 @@ export const useMessagesStore = defineStore('messages', {
 
       try {
         const { $api } = useNuxtApp()
-        await $api(`/messages/${messageId}`, { method: 'DELETE' })
+        await $api.delete(`/messages/${messageId}`)
 
         // Remove from messages list
         this.messages = this.messages.filter(m => m.id !== messageId)
@@ -268,7 +250,7 @@ export const useMessagesStore = defineStore('messages', {
     async fetchUnreadCount() {
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<{ count: number }>>('/messages/unread/count')
+        const response = await $api.get<ApiResponse<{ count: number }>>('/messages/unread/count')
         this.unreadCount = response.data.count
       } catch (error: any) {
         console.error('Error fetching unread count:', error)

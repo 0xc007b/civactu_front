@@ -101,15 +101,13 @@ export const useTagsStore = defineStore('tags', {
       try {
         const { $api } = useNuxtApp()
         
-        const params = new URLSearchParams({
-          page: page.toString(),
-          limit: limit.toString(),
+        const response = await $api.get<PaginatedResponse<Tag>>('/tags', {
+          page,
+          limit,
           ...Object.fromEntries(
             Object.entries(this.filters).filter(([_, value]) => value !== undefined && value !== '')
           )
         })
-
-        const response = await $api<PaginatedResponse<Tag>>(`/tags?${params}`)
 
         if (page === 1 || refresh) {
           this.tags = response.data
@@ -118,16 +116,11 @@ export const useTagsStore = defineStore('tags', {
         }
 
         // Update cache
-        response.data.forEach(tag => {
+        response.data.forEach((tag: Tag) => {
           this.cache.set(tag.id, tag)
         })
 
-        this.pagination = {
-          page: response.page,
-          limit: response.limit,
-          total: response.total,
-          totalPages: response.totalPages
-        }
+        this.pagination = response.meta.pagination
       } catch (error: any) {
         this.error = error.message || 'Erreur lors du chargement des tags'
         console.error('Error fetching tags:', error)
@@ -139,7 +132,7 @@ export const useTagsStore = defineStore('tags', {
     async fetchPopularTags(limit = 20) {
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<Tag[]>>(`/tags/popular?limit=${limit}`)
+        const response = await $api.get<ApiResponse<Tag[]>>(`/tags/popular?limit=${limit}`)
         
         this.popularTags = response.data
         
@@ -163,7 +156,7 @@ export const useTagsStore = defineStore('tags', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<Tag>>(`/tags/${id}`)
+        const response = await $api.get<ApiResponse<Tag>>(`/tags/${id}`)
         
         this.currentTag = response.data
         this.cache.set(id, response.data)
@@ -183,7 +176,7 @@ export const useTagsStore = defineStore('tags', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<Tag[]>>(`/tags/search?q=${encodeURIComponent(query)}`)
+        const response = await $api.get<ApiResponse<Tag[]>>(`/tags/search?q=${encodeURIComponent(query)}`)
         
         // Update cache
         response.data.forEach(tag => {
@@ -203,7 +196,7 @@ export const useTagsStore = defineStore('tags', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<Tag>>('/tags', {
+        const response = await $api.get<ApiResponse<Tag>>('/tags', {
           method: 'POST',
           body: tagData
         })
@@ -237,7 +230,7 @@ export const useTagsStore = defineStore('tags', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<Tag>>(`/tags/${id}`, {
+        const response = await $api.get<ApiResponse<Tag>>(`/tags/${id}`, {
           method: 'PATCH',
           body: updateData
         })
@@ -280,7 +273,7 @@ export const useTagsStore = defineStore('tags', {
 
       try {
         const { $api } = useNuxtApp()
-        await $api(`/tags/${id}`, { method: 'DELETE' })
+        await $api.delete('/tags/${id}')
 
         // Remove from list
         this.tags = this.tags.filter(t => t.id !== id)
@@ -319,7 +312,7 @@ export const useTagsStore = defineStore('tags', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<Tag[]>>('/tags/suggest', {
+        const response = await $api.get<ApiResponse<Tag[]>>('/tags/suggest', {
           method: 'POST',
           body: { content }
         })

@@ -238,9 +238,9 @@ export const usePagination = <T>(
       })
 
       if (resetItems) {
-        items.value = response.data
+        items.value = response.data as T[]
       } else {
-        items.value = [...items.value, ...response.data]
+        items.value = [...(items.value as T[]), ...(response.data as T[])]
       }
 
       pagination.value = response.meta.pagination

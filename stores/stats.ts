@@ -29,28 +29,28 @@ export const useStatsStore = defineStore('stats', {
     },
 
     totalOpinions: (state) => {
-      return state.globalStats?.opinionsCount || 0
+      return state.globalStats?.public?.opinionsCount || 0
     },
 
     totalUsers: (state) => {
-      return state.globalStats?.usersCount || 0
+      return state.globalStats?.public?.usersCount || 0
     },
 
     totalComments: (state) => {
-      return state.globalStats?.commentsCount || 0
+      return state.globalStats?.public?.commentsCount || 0
     },
 
     averageRating: (state) => {
-      return state.globalStats?.averageRating || 0
+      return state.globalStats?.public?.averageRating || 0
     },
 
     userRank: (state) => {
-      return state.userStats?.userRank || null
+      return state.userStats?.users?.userRank || null
     },
 
     userContributions: (state) => {
-      if (!state.userStats) return 0
-      return (state.userStats.opinionsCount || 0) + (state.userStats.commentsCount || 0)
+      if (!state.userStats?.users) return 0
+      return (state.userStats.users.opinionsCount || 0) + (state.userStats.users.commentsCount || 0)
     },
 
     isStatsStale: (state) => {
@@ -71,7 +71,7 @@ export const useStatsStore = defineStore('stats', {
       try {
         const { $api } = useNuxtApp()
         const endpoint = userId ? `/stats/user/${userId}` : '/stats/user'
-        const response = await $api<ApiResponse<Stats>>(endpoint)
+        const response = await $api.get<ApiResponse<Stats>>(endpoint)
         
         this.userStats = response.data
         this.lastUpdated = new Date().toISOString()
@@ -94,7 +94,7 @@ export const useStatsStore = defineStore('stats', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<Stats>>('/stats/global')
+        const response = await $api.get<ApiResponse<Stats>>('/stats/global')
         
         this.globalStats = response.data
         this.lastUpdated = new Date().toISOString()
@@ -117,7 +117,7 @@ export const useStatsStore = defineStore('stats', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<Stats>>(`/stats/location/${locationId}`)
+        const response = await $api.get<ApiResponse<Stats>>(`/stats/location/${locationId}`)
         
         this.locationStats[locationId] = response.data
         this.lastUpdated = new Date().toISOString()
@@ -137,7 +137,7 @@ export const useStatsStore = defineStore('stats', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<{
+        const response = await $api.get<ApiResponse<{
           user: Stats
           global: Stats
           locations: Record<string, Stats>
@@ -168,7 +168,7 @@ export const useStatsStore = defineStore('stats', {
         locationIds.forEach(id => params.append('locationIds', id))
         if (timeRange) params.set('timeRange', timeRange)
 
-        const response = await $api<ApiResponse<Record<string, Stats>>>(`/stats/compare?${params}`)
+        const response = await $api.get<ApiResponse<Record<string, Stats>>>(`/stats/compare?${params}`)
         
         // Update location stats with fresh data
         Object.entries(response.data).forEach(([locationId, stats]) => {
@@ -192,7 +192,7 @@ export const useStatsStore = defineStore('stats', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<{
+        const response = await $api.get<ApiResponse<{
           opinions: Array<{ date: string; count: number }>
           users: Array<{ date: string; count: number }>
           comments: Array<{ date: string; count: number }>
@@ -211,7 +211,7 @@ export const useStatsStore = defineStore('stats', {
     async fetchLeaderboard(category: 'opinions' | 'comments' | 'likes' = 'opinions', limit = 10) {
       try {
         const { $api } = useNuxtApp()
-        const response = await $api<ApiResponse<Array<{
+        const response = await $api.get<ApiResponse<Array<{
           userId: string
           username: string
           count: number
@@ -244,9 +244,9 @@ export const useStatsStore = defineStore('stats', {
     },
 
     updateAverageRating(newRating: number, oldRating?: number) {
-      if (this.globalStats) {
-        const currentAvg = this.globalStats.averageRating || 0
-        const currentCount = this.globalStats.opinionsCount || 0
+      if (this.globalStats?.public) {
+        const currentAvg = this.globalStats.public.averageRating || 0
+        const currentCount = this.globalStats.public.opinionsCount || 0
         
         let newAvg: number
         if (oldRating !== undefined) {
@@ -257,7 +257,7 @@ export const useStatsStore = defineStore('stats', {
           newAvg = ((currentAvg * currentCount) + newRating) / (currentCount + 1)
         }
         
-        this.globalStats.averageRating = Math.round(newAvg * 100) / 100
+        this.globalStats.public.averageRating = Math.round(newAvg * 100) / 100
       }
     },
 

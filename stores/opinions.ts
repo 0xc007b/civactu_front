@@ -146,23 +146,21 @@ export const useOpinionsStore = defineStore('opinions', {
 
         const response = await $api.put<{ opinion: Opinion }>(`/opinions/${id}`, opinionData)
 
-        if (response.success) {
-          const updatedOpinion = response.data.opinion
-          
-          // Mettre à jour dans la liste
-          const index = this.opinions.findIndex(opinion => opinion.id === id)
-          if (index !== -1) {
-            this.opinions[index] = updatedOpinion
-          }
-          
-          // Mettre à jour le cache et l'avis courant
-          this.cache[id] = updatedOpinion
-          if (this.currentOpinion?.id === id) {
-            this.currentOpinion = updatedOpinion
-          }
-          
-          return updatedOpinion
+        const updatedOpinion = response.opinion
+        
+        // Mettre à jour dans la liste
+        const index = this.opinions.findIndex(opinion => opinion.id === id)
+        if (index !== -1) {
+          this.opinions[index] = updatedOpinion
         }
+        
+        // Mettre à jour le cache et l'avis courant
+        this.cache[id] = updatedOpinion
+        if (this.currentOpinion?.id === id) {
+          this.currentOpinion = updatedOpinion
+        }
+        
+        return updatedOpinion
       } catch (error: any) {
         const apiError = error as ApiError
         throw new Error(apiError.response?.error.message || 'Erreur lors de la mise à jour de l\'avis')
@@ -195,30 +193,28 @@ export const useOpinionsStore = defineStore('opinions', {
 
         const response = await $api.post<{ liked: boolean; likesCount: number }>(`/opinions/${id}/like`)
 
-        if (response.success) {
-          const { liked, likesCount } = response.data
-          
-          // Mettre à jour dans la liste
-          const opinion = this.opinions.find(op => op.id === id)
-          if (opinion) {
-            opinion.isLiked = liked
-            opinion.likesCount = likesCount
-          }
-          
-          // Mettre à jour le cache
-          if (this.cache[id]) {
-            this.cache[id].isLiked = liked
-            this.cache[id].likesCount = likesCount
-          }
-          
-          // Mettre à jour l'avis courant
-          if (this.currentOpinion?.id === id) {
-            this.currentOpinion.isLiked = liked
-            this.currentOpinion.likesCount = likesCount
-          }
-          
-          return { liked, likesCount }
+        const { liked, likesCount } = response
+        
+        // Mettre à jour dans la liste
+        const opinion = this.opinions.find(op => op.id === id)
+        if (opinion) {
+          opinion.isLiked = liked
+          opinion.likesCount = likesCount
         }
+        
+        // Mettre à jour le cache
+        if (this.cache[id]) {
+          this.cache[id].isLiked = liked
+          this.cache[id].likesCount = likesCount
+        }
+          
+        // Mettre à jour l'avis courant
+        if (this.currentOpinion?.id === id) {
+          this.currentOpinion.isLiked = liked
+          this.currentOpinion.likesCount = likesCount
+        }
+        
+        return { liked, likesCount }
       } catch (error: any) {
         const apiError = error as ApiError
         throw new Error(apiError.response?.error.message || 'Erreur lors du like')
@@ -239,15 +235,13 @@ export const useOpinionsStore = defineStore('opinions', {
           ...this.filters
         })
 
-        if (response.success) {
-          this.opinions.push(...response.data)
-          this.pagination = response.meta.pagination
-          
-          // Mettre en cache les nouveaux avis
-          response.data.forEach(opinion => {
-            this.cache[opinion.id] = opinion
-          })
-        }
+        this.opinions = [...this.opinions, ...response.data]
+        this.pagination = response.meta.pagination
+        
+        // Mettre en cache les nouveaux avis
+        response.data.forEach(opinion => {
+          this.cache[opinion.id] = opinion
+        })
       } catch (error: any) {
         const apiError = error as ApiError
         throw new Error(apiError.response?.error.message || 'Erreur lors du chargement')
@@ -315,11 +309,11 @@ export const useOpinionsStore = defineStore('opinions', {
         opinion.comments.push(comment)
       }
       
-      if (this.cache[comment.opinionId]?.comments) {
-        this.cache[comment.opinionId].comments.push(comment)
+      if (this.cache[comment.opinionId] && this.cache[comment.opinionId].comments) {
+        this.cache[comment.opinionId].comments!.push(comment)
       }
       
-      if (this.currentOpinion?.id === comment.opinionId && this.currentOpinion.comments) {
+      if (this.currentOpinion?.id === comment.opinionId && this.currentOpinion?.comments) {
         this.currentOpinion.comments.push(comment)
       }
     }
