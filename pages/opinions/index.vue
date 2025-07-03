@@ -1,62 +1,104 @@
 <template>
-  <div class="space-y-6">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 class="text-3xl font-extrabold text-gray-900">
           Avis et Opinions
         </h1>
-        <p class="text-gray-600 dark:text-gray-400">
+        <p class="text-gray-600">
           Partagez votre point de vue sur les sujets qui vous concernent
         </p>
       </div>
       
-      <UButton to="/opinions/create" icon="i-heroicons-plus">
+      <UButton to="/opinions/create" icon="i-heroicons-plus" color="blue" variant="solid">
         Créer un avis
       </UButton>
     </div>
 
-    <!-- Filters -->
-    <UCard>
-      <div class="flex flex-wrap items-center gap-4">
-        <div class="flex items-center space-x-2">
-          <USelect
-            v-model="filters.type"
-            :options="typeOptions"
-            placeholder="Type d'avis"
-            class="w-40"
-          />
-          <USelect
-            v-model="filters.municipality"
-            :options="municipalityOptions"
-            placeholder="Commune"
-            class="w-40"
-          />
-          <UButton
-            variant="outline"
-            @click="resetFilters"
-            :disabled="!hasActiveFilters"
-          >
-            Réinitialiser
-          </UButton>
+    <!-- Filtres -->
+    <div class="bg-white rounded-xl shadow-sm border border-blue-100 overflow-hidden">
+      <div class="bg-blue-50 px-6 py-4 border-b border-blue-100">
+        <h2 class="text-lg font-medium text-blue-800">Filtres</h2>
+      </div>
+      
+      <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Type d'avis -->
+          <div>
+            <div class="flex items-center mb-2">
+              <UIcon name="i-heroicons-funnel" class="mr-2 text-blue-600 size-4" />
+              <span class="text-sm font-medium text-gray-700">Type d'avis</span>
+            </div>
+            <USelect
+              v-model="filters.type"
+              :options="typeOptions"
+              placeholder="Tous les types"
+              class="w-full"
+              size="lg"
+              color="blue"
+            />
+          </div>
+          
+          <!-- Commune -->
+          <div>
+            <div class="flex items-center mb-2">
+              <UIcon name="i-heroicons-map-pin" class="mr-2 text-blue-600 size-4" />
+              <span class="text-sm font-medium text-gray-700">Commune</span>
+            </div>
+            <USelect
+              v-model="filters.municipality"
+              :options="municipalityOptions"
+              placeholder="Toutes les communes"
+              class="w-full"
+              size="lg"
+              color="blue"
+            />
+          </div>
+          
+          <!-- Recherche -->
+          <div>
+            <div class="flex items-center mb-2">
+              <UIcon name="i-heroicons-magnifying-glass" class="mr-2 text-blue-600 size-4" />
+              <span class="text-sm font-medium text-gray-700">Recherche</span>
+            </div>
+            <div class="flex space-x-2">
+              <UInput
+                v-model="searchQuery"
+                placeholder="Rechercher..."
+                class="w-full"
+                size="lg"
+                color="blue"
+                @keydown.enter="handleSearch"
+              />
+              <UButton 
+                @click="handleSearch" 
+                variant="solid" 
+                color="blue"
+                size="lg"
+                icon="i-heroicons-magnifying-glass"
+              />
+            </div>
+          </div>
         </div>
         
-        <div class="flex items-center space-x-2 ml-auto">
-          <UInput
-            v-model="searchQuery"
-            placeholder="Rechercher..."
-            icon="i-heroicons-magnifying-glass"
-            @keydown.enter="handleSearch"
-          />
-          <UButton @click="handleSearch" variant="outline">
-            Rechercher
+        <!-- Actions -->
+        <div class="flex justify-end mt-6">
+          <UButton
+            variant="ghost"
+            color="gray"
+            @click="resetFilters"
+            :disabled="!hasActiveFilters"
+            class="mr-2"
+          >
+            Réinitialiser les filtres
           </UButton>
         </div>
       </div>
-    </UCard>
+    </div>
 
-    <!-- Quick Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <!-- Statistiques rapides -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
       <StatsCard
         title="Total des avis"
         :value="stats.total || 0"
@@ -91,7 +133,7 @@
       @unlike="handleUnlike"
     />
 
-    <!-- Load More -->
+    <!-- Charger plus -->
     <div v-if="hasMore" class="text-center">
       <UButton
         variant="outline"
@@ -102,6 +144,8 @@
       </UButton>
     </div>
   </div>
+
+
 </template>
 
 <script setup>
@@ -122,6 +166,8 @@ const searchQuery = ref('')
 const loadingMore = ref(false)
 const page = ref(1)
 const limit = 20
+
+
 
 const filters = reactive({
   type: null,
@@ -262,6 +308,8 @@ const handleUnlike = async (opinionId) => {
     // Error handled by useApi
   }
 }
+
+
 
 // Watch for filter changes
 watch([filters], () => {

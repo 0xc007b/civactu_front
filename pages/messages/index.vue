@@ -1,47 +1,25 @@
 <template>
-  <div class="space-y-6">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 class="text-3xl font-extrabold text-gray-900">
           Messages
         </h1>
-        <p class="text-gray-600 dark:text-gray-400">
+        <p class="text-gray-600">
           Communiquez avec les autres citoyens et les élus
         </p>
       </div>
       
-      <UButton to="/messages/compose" icon="i-heroicons-pencil-square">
+      <UButton icon="i-heroicons-pencil-square" color="blue" variant="solid">
         Nouveau message
       </UButton>
     </div>
 
-    <!-- Search and Filters -->
-    <UCard>
-      <div class="flex items-center space-x-4">
-        <UInput
-          v-model="searchQuery"
-          placeholder="Rechercher dans les messages..."
-          icon="i-heroicons-magnifying-glass"
-          class="flex-1"
-          @keydown.enter="handleSearch"
-        />
-        
-        <USelect
-          v-model="filterType"
-          :options="filterOptions"
-          placeholder="Filtrer"
-          class="w-40"
-        />
-        
-        <UButton @click="handleSearch" variant="outline">
-          Rechercher
-        </UButton>
-      </div>
-    </UCard>
 
-    <!-- Quick Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+    <!-- Statistiques -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-8">
       <StatsCard
         title="Messages reçus"
         :value="stats.received || 0"
@@ -63,22 +41,20 @@
       />
     </div>
 
-    <!-- Messages List -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Conversations List -->
+    <!-- Liste des messages -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+      <!-- Liste des conversations -->
       <div class="lg:col-span-1">
-        <UCard>
-          <template #header>
-            <div class="flex items-center justify-between">
-              <h2 class="text-lg font-semibold">Conversations</h2>
-              <UBadge v-if="unreadCount > 0" :label="unreadCount" color="orange" />
-            </div>
-          </template>
+        <div class="bg-white rounded-xl shadow-sm border border-blue-100 overflow-hidden h-[600px] flex flex-col">
+          <div class="bg-blue-50 px-6 py-4 border-b border-blue-100 flex items-center justify-between">
+            <h2 class="text-lg font-medium text-blue-800">Conversations</h2>
+            <UBadge v-if="unreadCount > 0" :label="unreadCount" color="orange" variant="solid" />
+          </div>
           
-          <div class="space-y-2">
+          <div class="p-4 space-y-2 overflow-y-auto flex-1">
             <div v-if="conversations.length === 0" class="text-center py-8">
               <UIcon name="i-heroicons-inbox" class="size-12 text-gray-400 mx-auto mb-4" />
-              <p class="text-gray-500 dark:text-gray-400">
+              <p class="text-gray-500">
                 Aucune conversation
               </p>
             </div>
@@ -89,8 +65,8 @@
               :class="[
                 'flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-colors',
                 selectedConversationId === conversation.id 
-                  ? 'bg-blue-100 dark:bg-blue-900/50' 
-                  : 'hover:bg-gray-50 dark:hover:bg-gray-800/50',
+                  ? 'bg-blue-100 shadow-sm' 
+                  : 'hover:bg-gray-50',
                 conversation.hasUnread && 'border-l-4 border-blue-500'
               ]"
               @click="selectConversation(conversation.id)"
@@ -105,18 +81,18 @@
                 <div class="flex items-center justify-between">
                   <p :class="[
                     'text-sm font-medium truncate',
-                    conversation.hasUnread ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300'
+                    conversation.hasUnread ? 'text-gray-900' : 'text-gray-700'
                   ]">
                     {{ getParticipantName(conversation.participant) }}
                   </p>
-                  <time class="text-xs text-gray-500 dark:text-gray-400">
+                  <time class="text-xs text-gray-500">
                     {{ formatRelativeTime(conversation.lastMessage?.createdAt) }}
                   </time>
                 </div>
                 
                 <p :class="[
                   'text-sm truncate',
-                  conversation.hasUnread ? 'font-medium text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-400'
+                  conversation.hasUnread ? 'font-medium text-gray-900' : 'text-gray-600'
                 ]">
                   {{ conversation.lastMessage?.content || 'Aucun message' }}
                 </p>
@@ -125,32 +101,33 @@
               <div v-if="conversation.hasUnread" class="w-2 h-2 bg-blue-600 rounded-full"></div>
             </div>
           </div>
-        </UCard>
+        </div>
       </div>
 
-      <!-- Message Thread -->
+      <!-- Fil de discussion -->
       <div class="lg:col-span-2">
-        <UCard v-if="selectedConversation" class="h-[600px] flex flex-col">
-          <template #header>
+        <div v-if="selectedConversation" class="bg-white rounded-xl shadow-sm border border-blue-100 overflow-hidden h-[600px] flex flex-col">
+          <div class="bg-blue-50 px-6 py-4 border-b border-blue-100">
             <div class="flex items-center space-x-3">
               <UAvatar
                 :src="selectedConversation.participant.avatar"
                 :alt="getParticipantName(selectedConversation.participant)"
-                size="sm"
+                size="md"
+                class="ring-2 ring-blue-200"
               />
               <div>
-                <h3 class="font-semibold">
+                <h3 class="font-semibold text-blue-800">
                   {{ getParticipantName(selectedConversation.participant) }}
                 </h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400">
+                <p class="text-sm text-gray-600">
                   {{ selectedConversation.participant.role === 'OFFICIAL' ? 'Élu' : 'Citoyen' }}
                 </p>
               </div>
             </div>
-          </template>
+          </div>
 
-          <!-- Messages Thread -->
-          <div class="flex-1 overflow-y-auto p-4 space-y-4" ref="messagesContainer">
+          <!-- Fil de messages -->
+          <div class="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50" ref="messagesContainer">
             <div
               v-for="message in selectedConversation.messages"
               :key="message.id"
@@ -160,27 +137,28 @@
               ]"
             >
               <div :class="[
-                'max-w-xs lg:max-w-md px-4 py-2 rounded-lg',
+                'max-w-xs lg:max-w-md px-5 py-3 rounded-2xl shadow-sm',
                 message.isFromCurrentUser 
                   ? 'bg-blue-600 text-white' 
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
+                  : 'bg-white text-gray-900'
               ]">
-                <p class="text-sm">{{ message.content }}</p>
-                <time class="text-xs opacity-75 block mt-1">
+                <p class="text-sm leading-relaxed">{{ message.content }}</p>
+                <time class="text-xs opacity-75 block mt-2 text-right">
                   {{ formatTime(message.createdAt) }}
                 </time>
               </div>
             </div>
           </div>
 
-          <!-- Message Input -->
-          <template #footer>
+          <!-- Saisie de message -->
+          <div class="p-4 border-t border-gray-200 bg-white">
             <div class="flex space-x-2">
               <UTextarea
                 v-model="newMessageContent"
                 placeholder="Tapez votre message..."
                 :rows="2"
                 class="flex-1"
+                color="blue"
                 @keydown.enter.prevent="sendMessage"
               />
               <UButton
@@ -188,31 +166,43 @@
                 :disabled="!newMessageContent.trim()"
                 :loading="sendingMessage"
                 icon="i-heroicons-paper-airplane"
+                color="blue"
+                variant="solid"
+                class="self-end"
               >
                 Envoyer
               </UButton>
             </div>
-          </template>
-        </UCard>
+          </div>
+        </div>
 
-        <!-- No conversation selected -->
-        <UCard v-else class="h-[600px] flex items-center justify-center">
-          <div class="text-center">
-            <UIcon name="i-heroicons-chat-bubble-left-right" class="size-16 text-gray-400 mx-auto mb-4" />
-            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+        <!-- Aucune conversation sélectionnée -->
+        <div v-else class="bg-white rounded-xl shadow-sm border border-blue-100 overflow-hidden h-[600px] flex items-center justify-center">
+          <div class="text-center p-8">
+            <div class="bg-blue-50 rounded-full p-6 w-24 h-24 flex items-center justify-center mx-auto mb-6">
+              <UIcon name="i-heroicons-chat-bubble-left-right" class="size-12 text-blue-500" />
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-3">
               Sélectionnez une conversation
             </h3>
-            <p class="text-gray-500 dark:text-gray-400 mb-4">
-              Choisissez une conversation dans la liste pour commencer à discuter
+            <p class="text-gray-600 mb-6 max-w-md mx-auto">
+              Choisissez une conversation dans la liste ou créez un nouveau message pour commencer à discuter
             </p>
-            <UButton to="/messages/compose" variant="outline">
+            <UButton 
+              variant="soft"
+              color="blue"
+              icon="i-heroicons-pencil-square"
+              class="shadow-sm"
+            >
               Nouveau message
             </UButton>
           </div>
-        </UCard>
+        </div>
       </div>
     </div>
   </div>
+
+
 </template>
 
 <script setup>
@@ -232,28 +222,17 @@ useHead({
 })
 
 // State
-const searchQuery = ref('')
-const filterType = ref(null)
 const selectedConversationId = ref(null)
 const newMessageContent = ref('')
 const sendingMessage = ref(false)
 const messagesContainer = ref(null)
 
-// Filter options
-const filterOptions = [
-  { label: 'Tous', value: null },
-  { label: 'Non lus', value: 'unread' },
-  { label: 'Reçus', value: 'received' },
-  { label: 'Envoyés', value: 'sent' }
-]
+
 
 // Data fetching
 const { data: conversationsData, pending, refresh } = await useLazyAsyncData(
   'conversations',
-  () => get('/api/v1/messages/conversations', {
-    search: searchQuery.value || undefined,
-    filter: filterType.value || undefined
-  }),
+  () => get('/api/v1/messages/conversations'),
   {
     default: () => ({
       data: [],
@@ -273,9 +252,7 @@ const selectedConversation = computed(() => {
 })
 
 // Methods
-const handleSearch = () => {
-  refresh()
-}
+// Suppression de la méthode handleSearch car le filtre a été retiré
 
 const selectConversation = async (conversationId) => {
   selectedConversationId.value = conversationId
@@ -396,8 +373,7 @@ watchEffect(() => {
   }
 })
 
-// Watch for filter changes
-watch([searchQuery, filterType], () => {
-  refresh()
-})
+// Suppression du watch pour les filtres qui ont été retirés
+
+
 </script>

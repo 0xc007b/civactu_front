@@ -1,12 +1,12 @@
 <template>
-  <div class="space-y-6">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 class="text-3xl font-extrabold text-gray-900">
           Signalements
         </h1>
-        <p class="text-gray-600 dark:text-gray-400">
+        <p class="text-gray-600">
           Signalez les problèmes de votre commune et suivez leur résolution
         </p>
       </div>
@@ -16,53 +16,105 @@
       </UButton>
     </div>
 
-    <!-- Filters -->
-    <UCard>
-      <div class="flex flex-wrap items-center gap-4">
-        <div class="flex items-center space-x-2">
-          <USelect
-            v-model="filters.status"
-            :options="statusOptions"
-            placeholder="Statut"
-            class="w-40"
-          />
-          <USelect
-            v-model="filters.category"
-            :options="categoryOptions"
-            placeholder="Catégorie"
-            class="w-40"
-          />
-          <USelect
-            v-model="filters.priority"
-            :options="priorityOptions"
-            placeholder="Priorité"
-            class="w-32"
-          />
-          <UButton
-            variant="outline"
-            @click="resetFilters"
-            :disabled="!hasActiveFilters"
-          >
-            Réinitialiser
-          </UButton>
+    <!-- Filtres -->
+    <div class="bg-white rounded-xl shadow-sm border border-blue-100 overflow-hidden">
+      <div class="bg-blue-50 px-6 py-4 border-b border-blue-100">
+        <h2 class="text-lg font-medium text-blue-800">Filtres</h2>
+      </div>
+      
+      <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <!-- Statut -->
+          <div>
+            <div class="flex items-center mb-2">
+              <UIcon name="i-heroicons-tag" class="mr-2 text-blue-600 size-4" />
+              <span class="text-sm font-medium text-gray-700">Statut</span>
+            </div>
+            <USelect
+              v-model="filters.status"
+              :options="statusOptions"
+              placeholder="Tous les statuts"
+              class="w-full"
+              size="lg"
+              color="blue"
+            />
+          </div>
+          
+          <!-- Catégorie -->
+          <div>
+            <div class="flex items-center mb-2">
+              <UIcon name="i-heroicons-folder" class="mr-2 text-blue-600 size-4" />
+              <span class="text-sm font-medium text-gray-700">Catégorie</span>
+            </div>
+            <USelect
+              v-model="filters.category"
+              :options="categoryOptions"
+              placeholder="Toutes les catégories"
+              class="w-full"
+              size="lg"
+              color="blue"
+            />
+          </div>
+          
+          <!-- Priorité -->
+          <div>
+            <div class="flex items-center mb-2">
+              <UIcon name="i-heroicons-flag" class="mr-2 text-blue-600 size-4" />
+              <span class="text-sm font-medium text-gray-700">Priorité</span>
+            </div>
+            <USelect
+              v-model="filters.priority"
+              :options="priorityOptions"
+              placeholder="Toutes les priorités"
+              class="w-full"
+              size="lg"
+              color="blue"
+            />
+          </div>
+          
+          <!-- Recherche -->
+          <div>
+            <div class="flex items-center mb-2">
+              <UIcon name="i-heroicons-magnifying-glass" class="mr-2 text-blue-600 size-4" />
+              <span class="text-sm font-medium text-gray-700">Recherche</span>
+            </div>
+            <div class="flex space-x-2">
+              <UInput
+                v-model="searchQuery"
+                placeholder="Rechercher..."
+                class="w-full"
+                size="lg"
+                color="blue"
+                @keydown.enter="handleSearch"
+              />
+              <UButton 
+                @click="handleSearch" 
+                variant="solid" 
+                color="blue"
+                size="lg"
+                icon="i-heroicons-magnifying-glass"
+              />
+            </div>
+          </div>
         </div>
         
-        <div class="flex items-center space-x-2 ml-auto">
-          <UInput
-            v-model="searchQuery"
-            placeholder="Rechercher..."
-            icon="i-heroicons-magnifying-glass"
-            @keydown.enter="handleSearch"
-          />
-          <UButton @click="handleSearch" variant="outline">
-            Rechercher
+        <!-- Actions -->
+        <div class="flex justify-end mt-6">
+          <UButton
+            variant="ghost"
+            color="gray"
+            @click="resetFilters"
+            :disabled="!hasActiveFilters"
+            class="mr-2"
+          >
+            Réinitialiser les filtres
           </UButton>
         </div>
       </div>
-    </UCard>
+    </div>
 
-    <!-- Quick Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <!-- Statistiques rapides -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
       <StatsCard
         title="Total"
         :value="stats.total || 0"
@@ -89,40 +141,54 @@
       />
     </div>
 
-    <!-- Quick Links -->
-    <div class="flex space-x-4">
+    <!-- Liens rapides -->
+    <div class="flex flex-wrap gap-4 mt-2">
       <UButton
-        variant="outline"
+        variant="soft"
+        color="blue"
         to="/reports/my"
         icon="i-heroicons-user"
+        class="shadow-sm"
       >
         Mes signalements
       </UButton>
       
       <UButton
         v-if="isOfficial"
-        variant="outline"
+        variant="soft"
+        color="blue"
         to="/reports/assigned"
         icon="i-heroicons-clipboard-document-list"
+        class="shadow-sm"
       >
         Signalements assignés
       </UButton>
     </div>
 
-    <!-- Reports List -->
-    <ReportList
-      :reports="reports"
-      :loading="pending"
-      :show-quick-actions="isOfficial"
-      @update-status="handleStatusUpdate"
-    />
+    <!-- Liste des signalements -->
+    <div class="bg-white rounded-xl shadow-sm border border-blue-100 overflow-hidden">
+      <div class="bg-blue-50 px-6 py-4 border-b border-blue-100">
+        <h2 class="text-lg font-medium text-blue-800">Liste des signalements</h2>
+      </div>
+      
+      <div class="p-4">
+        <ReportList
+          :reports="reports"
+          :loading="pending"
+          :show-quick-actions="isOfficial"
+          @update-status="handleStatusUpdate"
+        />
+      </div>
+    </div>
 
-    <!-- Load More -->
-    <div v-if="hasMore" class="text-center">
+    <!-- Charger plus -->
+    <div v-if="hasMore" class="text-center mt-6">
       <UButton
         variant="outline"
+        color="blue"
         @click="loadMore"
         :loading="loadingMore"
+        class="px-6"
       >
         Charger plus
       </UButton>

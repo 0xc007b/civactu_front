@@ -1,18 +1,17 @@
 <template>
   <NuxtLink
     :to="to"
-    class="flex items-center rounded-sm gap-2 px-2 py-1.5 text-sm font-medium underline-offset-2 hover:bg-black/5 hover:text-neutral-900 focus-visible:underline focus:outline-hidden dark:hover:bg-white/5 dark:hover:text-white transition-colors"
-    :class="isActive ? 'bg-black/10 text-neutral-900 dark:bg-white/10 dark:text-white' : 'text-neutral-600 dark:text-neutral-300'"
+    class="flex items-center rounded-lg gap-3 px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-blue-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+    :class="isActive ? 'bg-blue-500 text-white shadow-sm' : 'text-blue-100 hover:text-white'"
   >
     <UIcon :name="icon" class="size-5 shrink-0" aria-hidden="true" />
     <span>{{ label }}</span>
-    <UBadge 
+    <span 
       v-if="badge" 
-      :label="badge" 
-      size="xs" 
-      color="primary"
-      class="ml-auto"
-    />
+      class="ml-auto bg-white text-blue-600 text-xs font-semibold px-2 py-0.5 rounded-full min-w-[20px] text-center"
+    >
+      {{ badge }}
+    </span>
     <span v-if="isActive" class="sr-only">active</span>
   </NuxtLink>
 </template>

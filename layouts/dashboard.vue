@@ -13,27 +13,30 @@
 
     <!-- Sidebar Navigation -->
     <nav 
-      class="fixed left-0 z-30 flex h-svh w-60 shrink-0 flex-col border-r border-neutral-300 bg-neutral-50 p-4 transition-transform duration-300 md:w-64 md:translate-x-0 md:relative dark:border-neutral-700 dark:bg-neutral-900" 
+      class="fixed left-0 z-30 flex h-svh w-60 shrink-0 flex-col border-r border-blue-100 bg-blue-600 p-4 transition-transform duration-300 md:w-64 md:translate-x-0 md:relative" 
       :class="sidebarIsOpen ? 'translate-x-0' : '-translate-x-60'" 
       aria-label="sidebar navigation"
     >
       <!-- Logo -->
-      <NuxtLink to="/dashboard" class="ml-2 w-fit text-2xl font-bold text-neutral-900 dark:text-white">
+      <NuxtLink to="/dashboard" class="ml-2 w-fit text-2xl font-bold text-white hover:text-blue-100 transition-colors">
         <span class="sr-only">CivActu</span>
-        <div class="text-2xl font-bold">CivActu</div>
+        <div class="text-2xl font-bold flex items-center gap-2">
+          <div class="bg-white text-blue-600 w-8 h-8 rounded-lg flex items-center justify-center text-lg font-bold">C</div>
+          CivActu
+        </div>
       </NuxtLink>
 
       <!-- Search -->
-      <div class="relative my-4 flex w-full max-w-xs flex-col gap-1 text-neutral-600 dark:text-neutral-300">
+      <div class="relative my-4 flex w-full max-w-xs flex-col gap-1">
         <UIcon 
           name="i-heroicons-magnifying-glass" 
-          class="absolute left-2 top-1/2 size-5 -translate-y-1/2 text-neutral-600/50 dark:text-neutral-300/50" 
+          class="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-blue-300" 
           aria-hidden="true"
         />
-        <UInput
+        <input
           v-model="searchQuery"
           type="search"
-          class="pl-9"
+          class="w-full pl-10 pr-4 py-2 bg-blue-500 border border-blue-400 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent"
           placeholder="Rechercher..."
           @keydown.enter="handleSearch"
         />
@@ -83,8 +86,8 @@
 
         <!-- Admin/Official specific links -->
         <template v-if="isOfficial || isAdmin">
-          <div class="border-t border-neutral-200 dark:border-neutral-700 my-2 pt-2">
-            <div class="text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-2 px-2">
+          <div class="border-t border-blue-400 my-3 pt-3">
+            <div class="text-xs font-semibold text-blue-200 mb-2 px-3 uppercase tracking-wide">
               {{ isAdmin ? 'Administration' : 'Élu' }}
             </div>
             
@@ -129,10 +132,10 @@
     </nav>
 
     <!-- Top navbar & main content -->
-    <div class="h-svh w-full overflow-y-auto bg-white dark:bg-neutral-950">
+    <div class="h-svh w-full overflow-y-auto bg-white">
       <!-- Top navbar -->
       <nav 
-        class="sticky top-0 z-10 flex items-center justify-between border-b border-neutral-300 bg-neutral-50 px-4 py-2 dark:border-neutral-700 dark:bg-neutral-900" 
+        class="sticky top-0 z-10 flex items-center justify-between border-b border-blue-100 bg-white px-4 py-3 shadow-sm" 
         aria-label="top navigation bar"
       >
         <!-- Sidebar toggle button for small screens -->
