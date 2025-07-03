@@ -207,13 +207,8 @@ civactu-frontend/
 │   ├── search/
 │   │   └── index.vue              # Recherche globale
 │   ├── stats/
-│   │   └── public.vue             # Statistiques publiques
-│   └── admin/                     # Pages d'administration
-│       ├── index.vue
-│       ├── users/
-│       ├── reports/
-│       ├── notifications/
-│       └── stats/
+│       └── public.vue             # Statistiques publiques
+│  
 ├── plugins/                        # Plugins Nuxt
 │   ├── api.client.ts
 │   ├── auth.client.ts

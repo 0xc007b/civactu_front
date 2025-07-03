@@ -1,0 +1,194 @@
+/* Animations et styles pour les pages d'authentification */
+
+/* Animation d'apparition pour les formulaires */
+.auth-form-enter {
+  animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation des boutons */
+.auth-button-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.auth-button-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Styles pour les indicateurs de force de mot de passe */
+.password-strength-indicator {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.password-strength-bar {
+  height: 4px;
+  border-radius: 2px;
+  transition: background-color 0.3s ease;
+}
+
+.password-strength-bar.weak {
+  background-color: #ef4444;
+}
+
+.password-strength-bar.medium {
+  background-color: #f59e0b;
+}
+
+.password-strength-bar.strong {
+  background-color: #10b981;
+}
+
+.password-strength-bar.inactive {
+  background-color: #e5e7eb;
+}
+
+/* Styles pour les messages d'erreur */
+.error-message {
+  animation: fadeInDown 0.3s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation des checkmarks */
+.checkmark-animation {
+  animation: checkmarkDraw 0.8s ease-out;
+}
+
+@keyframes checkmarkDraw {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Styles pour les inputs avec état de validation */
+.input-valid {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.input-invalid {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Animation de loading */
+.loading-dots {
+  display: inline-flex;
+  align-items: center;
+}
+
+.loading-dots::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: 8px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Styles pour les pages de succès/erreur */
+.status-icon {
+  animation: statusIconPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes statusIconPop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Amélioration des focus states */
+.focus-visible:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Hover effects pour les liens */
+.link-hover {
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.link-hover::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: currentColor;
+  transition: width 0.3s ease;
+}
+
+.link-hover:hover::after {
+  width: 100%;
+}
+
+/* Dark mode support (si nécessaire plus tard) */
+@media (prefers-color-scheme: dark) {
+  .auth-form-enter {
+    background-color: #1f2937;
+    border-color: #374151;
+  }
+}
+
+/* Responsive improvements */
+@media (max-width: 640px) {
+  .auth-form-enter {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .auth-form-enter,
+  .auth-button-hover,
+  .error-message,
+  .status-icon {
+    animation: none;
+    transition: none;
+  }
+}
