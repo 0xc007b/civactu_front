@@ -2,7 +2,7 @@
 
 ## Résumé des modifications effectuées
 
-Tous les endpoints ont été mis à jour pour correspondre à la documentation API officielle disponible sur `https://api.civactu.flrxnt.com/api/docs#/`. Le préfixe `/api/v1` a été ajouté à tous les endpoints.
+Tous les endpoints ont été mis à jour pour correspondre à la documentation API officielle disponible sur `https://api.civactu.flrxnt.com/api/docs#/`. Le préfixe `` a été ajouté à tous les endpoints.
 
 ### 1. Composables créés/mis à jour
 
@@ -18,135 +18,135 @@ Tous les endpoints ont été mis à jour pour correspondre à la documentation A
 - **`useApiNotifications.ts`** - Notifications API (distinctes des notifications toast)
 
 #### Composables mis à jour :
-- **`useAuth.ts`** - Endpoints d'authentification mis à jour avec `/api/v1` et ajout de `resendVerification`
+- **`useAuth.ts`** - Endpoints d'authentification mis à jour avec `` et ajout de `resendVerification`
 
 ### 2. Stores mis à jour
 
 #### `stores/auth.ts` :
-- ✅ `/api/v1/auth/login`
-- ✅ `/api/v1/auth/register`
-- ✅ `/api/v1/auth/refresh`
-- ✅ `/api/v1/auth/forgot-password`
-- ✅ `/api/v1/auth/reset-password`
-- ✅ `/api/v1/auth/verify-email`
-- ✅ `/api/v1/auth/resend-verification`
-- ✅ `/api/v1/users/me` (pour initializeAuth)
-- ✅ `/api/v1/users/profile` (pour updateProfile)
+- ✅ `/auth/login`
+- ✅ `/auth/register`
+- ✅ `/auth/refresh`
+- ✅ `/auth/forgot-password`
+- ✅ `/auth/reset-password`
+- ✅ `/auth/verify-email`
+- ✅ `/auth/resend-verification`
+- ✅ `/users/me` (pour initializeAuth)
+- ✅ `/users/profile` (pour updateProfile)
 
 #### `stores/opinions.ts` :
-- ✅ `/api/v1/opinions` (GET, POST)
-- ✅ `/api/v1/opinions/{id}` (GET, PATCH, DELETE)
-- ✅ `/api/v1/opinions/{id}/like` (POST)
+- ✅ `/opinions` (GET, POST)
+- ✅ `/opinions/{id}` (GET, PATCH, DELETE)
+- ✅ `/opinions/{id}/like` (POST)
 
 #### `stores/reports.ts` :
-- ✅ `/api/v1/reports` (GET, POST)
-- ✅ `/api/v1/reports/{id}` (GET, PATCH, DELETE)
-- ✅ `/api/v1/reports/{id}/assign` (POST) - Nouveau
-- ✅ `/api/v1/reports/{id}/update` (POST) - Nouveau
+- ✅ `/reports` (GET, POST)
+- ✅ `/reports/{id}` (GET, PATCH, DELETE)
+- ✅ `/reports/{id}/assign` (POST) - Nouveau
+- ✅ `/reports/{id}/update` (POST) - Nouveau
 - 🔧 Correction des méthodes HTTP incorrectes
 
 #### `stores/tags.ts` :
-- ✅ `/api/v1/tags` (GET, POST)
-- ✅ `/api/v1/tags/{id}` (GET, PATCH, DELETE)
+- ✅ `/tags` (GET, POST)
+- ✅ `/tags/{id}` (GET, PATCH, DELETE)
 - 🔧 Suppression des endpoints inexistants (search, popular, suggest)
 - 🔧 Correction des méthodes HTTP incorrectes
 
 ### 3. Nouveau store créé
 
 #### `stores/regions.ts` :
-- ✅ `/api/v1/locations/regions` (GET, POST)
-- ✅ `/api/v1/locations/regions/{id}` (PUT, DELETE)
-- ✅ `/api/v1/locations/municipalities` (GET, POST)
-- ✅ `/api/v1/locations/municipalities/{id}` (GET, PUT, DELETE)
+- ✅ `/locations/regions` (GET, POST)
+- ✅ `/locations/regions/{id}` (PUT, DELETE)
+- ✅ `/locations/municipalities` (GET, POST)
+- ✅ `/locations/municipalities/{id}` (GET, PUT, DELETE)
 
 ### 4. Endpoints API couverts selon la documentation
 
 #### Authentication ✅
-- [x] POST `/api/v1/auth/login`
-- [x] POST `/api/v1/auth/register`
-- [x] POST `/api/v1/auth/refresh`
-- [x] POST `/api/v1/auth/forgot-password`
-- [x] POST `/api/v1/auth/reset-password`
-- [x] POST `/api/v1/auth/verify-email`
-- [x] GET `/api/v1/auth/verify-email`
-- [x] POST `/api/v1/auth/resend-verification`
+- [x] POST `/auth/login`
+- [x] POST `/auth/register`
+- [x] POST `/auth/refresh`
+- [x] POST `/auth/forgot-password`
+- [x] POST `/auth/reset-password`
+- [x] POST `/auth/verify-email`
+- [x] GET `/auth/verify-email`
+- [x] POST `/auth/resend-verification`
 
 #### Users ✅
-- [x] POST `/api/v1/users`
-- [x] GET `/api/v1/users`
-- [x] GET `/api/v1/users/me`
-- [x] GET `/api/v1/users/profile`
-- [x] PUT `/api/v1/users/profile`
-- [x] GET `/api/v1/users/{id}`
-- [x] PATCH `/api/v1/users/{id}`
-- [x] DELETE `/api/v1/users/{id}`
+- [x] POST `/users`
+- [x] GET `/users`
+- [x] GET `/users/me`
+- [x] GET `/users/profile`
+- [x] PUT `/users/profile`
+- [x] GET `/users/{id}`
+- [x] PATCH `/users/{id}`
+- [x] DELETE `/users/{id}`
 
 #### Opinions ✅
-- [x] POST `/api/v1/opinions`
-- [x] GET `/api/v1/opinions`
-- [x] GET `/api/v1/opinions/{id}`
-- [x] PATCH `/api/v1/opinions/{id}`
-- [x] DELETE `/api/v1/opinions/{id}`
-- [x] POST `/api/v1/opinions/{id}/like`
+- [x] POST `/opinions`
+- [x] GET `/opinions`
+- [x] GET `/opinions/{id}`
+- [x] PATCH `/opinions/{id}`
+- [x] DELETE `/opinions/{id}`
+- [x] POST `/opinions/{id}/like`
 
 #### Reports ✅
-- [x] POST `/api/v1/reports`
-- [x] GET `/api/v1/reports`
-- [x] GET `/api/v1/reports/{id}`
-- [x] PATCH `/api/v1/reports/{id}`
-- [x] DELETE `/api/v1/reports/{id}`
-- [x] POST `/api/v1/reports/{id}/assign`
-- [x] POST `/api/v1/reports/{id}/update`
+- [x] POST `/reports`
+- [x] GET `/reports`
+- [x] GET `/reports/{id}`
+- [x] PATCH `/reports/{id}`
+- [x] DELETE `/reports/{id}`
+- [x] POST `/reports/{id}/assign`
+- [x] POST `/reports/{id}/update`
 
 #### Messages ✅
-- [x] POST `/api/v1/messages`
-- [x] GET `/api/v1/messages`
-- [x] GET `/api/v1/messages/{id}`
-- [x] DELETE `/api/v1/messages/{id}`
-- [x] PUT `/api/v1/messages/{id}/read`
-- [x] POST `/api/v1/messages/{id}/reply`
+- [x] POST `/messages`
+- [x] GET `/messages`
+- [x] GET `/messages/{id}`
+- [x] DELETE `/messages/{id}`
+- [x] PUT `/messages/{id}/read`
+- [x] POST `/messages/{id}/reply`
 
 #### Locations ✅
-- [x] GET `/api/v1/locations/regions`
-- [x] POST `/api/v1/locations/regions`
-- [x] PUT `/api/v1/locations/regions/{id}`
-- [x] DELETE `/api/v1/locations/regions/{id}`
-- [x] GET `/api/v1/locations/municipalities`
-- [x] POST `/api/v1/locations/municipalities`
-- [x] GET `/api/v1/locations/municipalities/{id}`
-- [x] PUT `/api/v1/locations/municipalities/{id}`
-- [x] DELETE `/api/v1/locations/municipalities/{id}`
+- [x] GET `/locations/regions`
+- [x] POST `/locations/regions`
+- [x] PUT `/locations/regions/{id}`
+- [x] DELETE `/locations/regions/{id}`
+- [x] GET `/locations/municipalities`
+- [x] POST `/locations/municipalities`
+- [x] GET `/locations/municipalities/{id}`
+- [x] PUT `/locations/municipalities/{id}`
+- [x] DELETE `/locations/municipalities/{id}`
 
 #### Notifications ✅
-- [x] GET `/api/v1/notifications`
-- [x] PUT `/api/v1/notifications/{id}/read`
-- [x] PUT `/api/v1/notifications/read-all`
-- [x] POST `/api/v1/notifications/send/user`
-- [x] POST `/api/v1/notifications/send/all`
-- [x] POST `/api/v1/notifications/send/municipality`
-- [x] POST `/api/v1/notifications/send/role`
+- [x] GET `/notifications`
+- [x] PUT `/notifications/{id}/read`
+- [x] PUT `/notifications/read-all`
+- [x] POST `/notifications/send/user`
+- [x] POST `/notifications/send/all`
+- [x] POST `/notifications/send/municipality`
+- [x] POST `/notifications/send/role`
 
 #### Comments ✅
-- [x] POST `/api/v1/comments`
-- [x] GET `/api/v1/comments`
-- [x] GET `/api/v1/comments/{id}`
-- [x] PATCH `/api/v1/comments/{id}`
-- [x] DELETE `/api/v1/comments/{id}`
+- [x] POST `/comments`
+- [x] GET `/comments`
+- [x] GET `/comments/{id}`
+- [x] PATCH `/comments/{id}`
+- [x] DELETE `/comments/{id}`
 
 #### Tags ✅
-- [x] POST `/api/v1/tags`
-- [x] GET `/api/v1/tags`
-- [x] GET `/api/v1/tags/{id}`
-- [x] PATCH `/api/v1/tags/{id}`
-- [x] DELETE `/api/v1/tags/{id}`
+- [x] POST `/tags`
+- [x] GET `/tags`
+- [x] GET `/tags/{id}`
+- [x] PATCH `/tags/{id}`
+- [x] DELETE `/tags/{id}`
 
 #### Statistics & Search ✅
-- [x] GET `/api/v1/search`
-- [x] GET `/api/v1/stats/dashboard`
-- [x] GET `/api/v1/stats/public`
+- [x] GET `/search`
+- [x] GET `/stats/dashboard`
+- [x] GET `/stats/public`
 
 #### Health ✅
-- [x] GET `/api/v1/health`
+- [x] GET `/health`
 
 ### 5. Corrections techniques effectuées
 
@@ -167,7 +167,7 @@ Tous les endpoints ont été mis à jour pour correspondre à la documentation A
 
 ### 7. Notes importantes
 
-- Tous les endpoints respectent maintenant la structure `/api/v1/` de l'API officielle
+- Tous les endpoints respectent maintenant la structure `/` de l'API officielle
 - Les composables sont prêts à être utilisés dans les pages et components
 - Les stores Pinia ont été mis à jour pour une gestion d'état cohérente
 - La gestion d'erreurs est unifiée à travers tout le projet

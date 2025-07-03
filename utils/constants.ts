@@ -1,6 +1,6 @@
 // Configuration de l'API
 export const API_CONFIG = {
-  BASE_URL: process.env.API_BASE_URL || 'http://localhost:3001/api/v1',
+  BASE_URL: process.env.API_BASE_URL || 'http://localhost:3001',
   TIMEOUT: 30000,
   RETRY_ATTEMPTS: 3,
   RETRY_DELAY: 1000

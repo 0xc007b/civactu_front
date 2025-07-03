@@ -14,6 +14,10 @@ interface NotificationOptions {
 
 export const useNotifications = () => {
   const appStore = useAppStore()
+  const notificationsStore = useNotificationsStore()
+
+  // Expose reactive state from notifications store
+  const { notifications, unreadCount, loading } = storeToRefs(notificationsStore)
 
   const show = (options: NotificationOptions) => {
     appStore.addNotification({
@@ -119,7 +123,13 @@ export const useNotifications = () => {
     error('Erreurs de validation', messages)
   }
 
+  // Notifications store methods
+  const fetchNotifications = notificationsStore.fetchNotifications
+  const markAsRead = notificationsStore.markAsRead
+  const markAllAsRead = notificationsStore.markAllAsRead
+
   return {
+    // Toast notifications
     show,
     success,
     error,
@@ -128,6 +138,16 @@ export const useNotifications = () => {
     clear,
     clearAll,
     handleApiError,
-    handleValidationErrors
+    handleValidationErrors,
+    
+    // User notifications state
+    notifications,
+    unreadCount,
+    loading,
+    
+    // User notifications methods
+    fetchNotifications,
+    markAsRead,
+    markAllAsRead
   }
 }

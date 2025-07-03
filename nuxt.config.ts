@@ -106,7 +106,7 @@ export default defineNuxtConfig({
   // Configuration API
   runtimeConfig: {
     public: {
-      apiBase: process.env.API_BASE_URL || 'http://localhost:3001/api/v1',
+      apiBase: process.env.API_BASE_URL || 'http://localhost:3001',
       wsUrl: process.env.WS_URL || 'ws://localhost:3001',
       appName: 'CivActu',
       appVersion: '1.0.0',

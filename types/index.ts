@@ -6,6 +6,7 @@ export * from './message';
 export * from './notification';
 export * from './opinion';
 export * from './report';
+export * from './route';
 export * from './stats';
 export * from './tag';
 export * from './user';

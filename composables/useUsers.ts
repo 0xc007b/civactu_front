@@ -17,7 +17,7 @@ export const useUsers = () => {
   const getAllUsers = async (params?: ApiQueryParams): Promise<PaginatedResponse<User>> => {
     try {
       const { $api } = useNuxtApp()
-      const response = await $api.get('/api/v1/users', params)
+      const response = await $api.get('/users', params)
       return response as PaginatedResponse<User>
     } catch (error) {
       throw error
@@ -56,7 +56,7 @@ export const useUsers = () => {
   const getUserById = async (id: string) => {
     try {
       const { $api } = useNuxtApp()
-      const response = await $api.get(`/api/v1/users/${id}`)
+      const response = await $api.get(`/users/${id}`)
       return response
     } catch (error) {
       throw error
@@ -67,7 +67,7 @@ export const useUsers = () => {
   const updateUser = async (id: string, userData: any) => {
     try {
       const { $api } = useNuxtApp()
-      const response = await $api.patch(`/api/v1/users/${id}`, userData)
+      const response = await $api.patch(`/users/${id}`, userData)
       return response
     } catch (error) {
       throw error
@@ -78,7 +78,7 @@ export const useUsers = () => {
   const deleteUser = async (id: string) => {
     try {
       const { $api } = useNuxtApp()
-      const response = await $api.delete(`/api/v1/users/${id}`)
+      const response = await $api.delete(`/users/${id}`)
       return response
     } catch (error) {
       throw error
@@ -115,6 +115,9 @@ export const useUsers = () => {
     canAccess
   } = authStore
 
+  // Méthode d'initialisation pour la compatibilité
+  const initializeAuth = () => authStore.initializeAuth()
+
   return {
     // Actions API
     createUser,
@@ -148,6 +151,7 @@ export const useUsers = () => {
     verifyEmail,
     resendVerificationEmail,
     refreshToken,
+    initializeAuth,
     hasRole,
     hasAnyRole,
     canAccess

@@ -91,7 +91,7 @@ export const useRegionsStore = defineStore('regions', {
         this.loading = true
         const { $api } = useNuxtApp()
 
-        const response = await $api.put<{ data: Region }>(`/api/v1/locations/regions/${id}`, regionData)
+        const response = await $api.put<{ data: Region }>(`/locations/regions/${id}`, regionData)
         const updatedRegion = response.data
         
         const index = this.regions.findIndex(r => r.id === id)
@@ -117,7 +117,7 @@ export const useRegionsStore = defineStore('regions', {
         this.loading = true
         const { $api } = useNuxtApp()
 
-        await $api.delete(`/api/v1/locations/regions/${id}`)
+        await $api.delete(`/locations/regions/${id}`)
         
         this.regions = this.regions.filter(r => r.id !== id)
         if (this.currentRegion?.id === id) {
@@ -171,7 +171,7 @@ export const useRegionsStore = defineStore('regions', {
         this.loading = true
         const { $api } = useNuxtApp()
 
-        const response = await $api.get<{ data: Municipality }>(`/api/v1/locations/municipalities/${id}`)
+        const response = await $api.get<{ data: Municipality }>(`/locations/municipalities/${id}`)
         this.currentMunicipality = response.data
         return response.data
       } catch (error: any) {
@@ -187,7 +187,7 @@ export const useRegionsStore = defineStore('regions', {
         this.loading = true
         const { $api } = useNuxtApp()
 
-        const response = await $api.put<{ data: Municipality }>(`/api/v1/locations/municipalities/${id}`, municipalityData)
+        const response = await $api.put<{ data: Municipality }>(`/locations/municipalities/${id}`, municipalityData)
         const updatedMunicipality = response.data
         
         const index = this.municipalities.findIndex(m => m.id === id)
@@ -213,7 +213,7 @@ export const useRegionsStore = defineStore('regions', {
         this.loading = true
         const { $api } = useNuxtApp()
 
-        await $api.delete(`/api/v1/locations/municipalities/${id}`)
+        await $api.delete(`/locations/municipalities/${id}`)
         
         this.municipalities = this.municipalities.filter(m => m.id !== id)
         if (this.currentMunicipality?.id === id) {

@@ -107,7 +107,7 @@ export const useOpinionsStore = defineStore('opinions', {
         this.isLoading = true
         const { $api } = useNuxtApp()
 
-        const response = await $api.get<{ opinion: Opinion }>(`/api/v1/opinions/${id}`)
+        const response = await $api.get<{ opinion: Opinion }>(`/opinions/${id}`)
 
         this.currentOpinion = response.opinion
         this.cache[id] = response.opinion
@@ -144,7 +144,7 @@ export const useOpinionsStore = defineStore('opinions', {
         this.isUpdating = true
         const { $api } = useNuxtApp()
 
-        const response = await $api.put<{ opinion: Opinion }>(`/api/v1/opinions/${id}`, opinionData)
+        const response = await $api.put<{ opinion: Opinion }>(`/opinions/${id}`, opinionData)
 
         const updatedOpinion = response.opinion
         
@@ -173,7 +173,7 @@ export const useOpinionsStore = defineStore('opinions', {
       try {
         const { $api } = useNuxtApp()
 
-        await $api.delete(`/api/v1/opinions/${id}`)
+        await $api.delete(`/opinions/${id}`)
 
         // Supprimer de la liste, du cache et réinitialiser si c'est l'avis courant
         this.opinions = this.opinions.filter(opinion => opinion.id !== id)
@@ -191,7 +191,7 @@ export const useOpinionsStore = defineStore('opinions', {
       try {
         const { $api } = useNuxtApp()
 
-        const response = await $api.post<{ liked: boolean; likesCount: number }>(`/api/v1/opinions/${id}/like`)
+        const response = await $api.post<{ liked: boolean; likesCount: number }>(`/opinions/${id}/like`)
 
         const { liked, likesCount } = response
         

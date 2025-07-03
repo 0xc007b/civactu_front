@@ -101,7 +101,7 @@ export const useMessagesStore = defineStore('messages', {
       try {
         const { $api } = useNuxtApp()
         
-        const response = await $api.get<PaginatedResponse<Message>>('/messages', {
+        const response = await $api.get<PaginatedResponse<Message>>('/api/v1/messages', {
           page,
           limit,
           ...Object.fromEntries(
@@ -134,7 +134,7 @@ export const useMessagesStore = defineStore('messages', {
       try {
         const { $api } = useNuxtApp()
         
-        const response = await $api.get<PaginatedResponse<Message>>(`/messages/conversation/${userId}`, {
+        const response = await $api.get<PaginatedResponse<Message>>(`/api/v1/messages/conversation/${userId}`, {
           page,
           limit
         })
@@ -159,7 +159,7 @@ export const useMessagesStore = defineStore('messages', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.post<ApiResponse<Message>>('/messages', messageData)
+        const response = await $api.post<ApiResponse<Message>>('/api/v1/messages', messageData)
 
         const newMessage = response.data
         this.messages.unshift(newMessage)
@@ -186,7 +186,7 @@ export const useMessagesStore = defineStore('messages', {
     async markAsRead(messageId: string) {
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.patch<ApiResponse<Message>>(`/messages/${messageId}/read`, {})
+        const response = await $api.patch<ApiResponse<Message>>(`/api/v1/messages/${messageId}/read`, {})
 
         const updatedMessage = response.data
         
@@ -250,7 +250,7 @@ export const useMessagesStore = defineStore('messages', {
     async fetchUnreadCount() {
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.get<ApiResponse<{ count: number }>>('/messages/unread/count')
+        const response = await $api.get<ApiResponse<{ count: number }>>('/api/v1/messages/unread/count')
         this.unreadCount = response.data.count
       } catch (error: any) {
         console.error('Error fetching unread count:', error)

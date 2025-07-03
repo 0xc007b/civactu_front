@@ -379,7 +379,7 @@ export default defineNuxtConfig({
   // Configuration API
   runtimeConfig: {
     public: {
-      apiBase: process.env.API_BASE_URL || 'http://localhost:3001/api/v1',
+      apiBase: process.env.API_BASE_URL || 'http://localhost:3001',
       wsUrl: process.env.WS_URL || 'ws://localhost:3001',
       appName: 'CivActu',
       appVersion: '1.0.0',
@@ -493,7 +493,7 @@ export const useAuthStore = defineStore('auth', {
     async login(credentials: LoginCredentials) {
       try {
         this.isLoading = true
-        const { data } = await $fetch<AuthResponse>('/auth/login', {
+        const { data } = await $fetch<AuthResponse>('/api/v1/auth/login', {
           method: 'POST',
           body: credentials
         })
@@ -512,7 +512,7 @@ export const useAuthStore = defineStore('auth', {
     async register(userData: RegisterData) {
       try {
         this.isLoading = true
-        const { data } = await $fetch<AuthResponse>('/auth/register', {
+        const { data } = await $fetch<AuthResponse>('/api/v1/auth/register', {
           method: 'POST',
           body: userData
         })
@@ -616,7 +616,7 @@ export const useAuthStore = defineStore('auth', {
       
       if (token) {
         try {
-          const { data } = await $fetch<{ user: User }>('/users/me', {
+          const { data } = await $fetch<{ user: User }>('/api/v1/users/me', {
             headers: {
               Authorization: `Bearer ${token}`
             }
@@ -631,7 +631,7 @@ export const useAuthStore = defineStore('auth', {
 
     async refreshToken() {
       try {
-        const { data } = await $fetch<AuthResponse>('/auth/refresh')
+        const { data } = await $fetch<AuthResponse>('/api/v1/auth/refresh')
         this.setAuth(data.user, data.access_token)
         return { success: true }
       } catch (error) {
@@ -745,7 +745,7 @@ export const useNotifications = () => {
   
   const fetchNotifications = async (filters: any = {}) => {
     try {
-      const { data } = await api.get('/notifications', filters)
+      const { data } = await api.get('/api/v1/notifications', filters)
       notifications.value = data
       return data
     } catch (error) {
@@ -760,7 +760,7 @@ export const useNotifications = () => {
   
   const markAsRead = async (id: string) => {
     try {
-      await api.put(`/notifications/${id}/read`)
+      await api.put(`/api/v1/notifications/${id}/read`)
       const notification = notifications.value.find(n => n.id === id)
       if (notification) {
         notification.status = 'READ'
@@ -777,7 +777,7 @@ export const useNotifications = () => {
   
   const markAllAsRead = async () => {
     try {
-      await api.put('/notifications/read-all')
+      await api.put('/api/v1/notifications/read-all')
       notifications.value.forEach(n => {
         n.status = 'READ'
         n.readAt = new Date().toISOString()
@@ -1228,7 +1228,7 @@ const { get } = useApi()
 
 // Récupération des données du dashboard
 const { data: dashboardData } = await useLazyAsyncData('dashboard', () =>
-  get('/stats/dashboard')
+  get('/api/v1/stats/dashboard')
 )
 
 const userStats = computed(() => dashboardData.value?.userStats || {})
@@ -1509,7 +1509,7 @@ const onSubmit = async () => {
       images: form.images.map(img => img.base64) // Conversion en base64 si nécessaire
     }
     
-    const { data } = await post('/reports', reportData)
+    const { data } = await post('/api/v1/reports', reportData)
     
     toast.add({
       title: 'Signalement créé',
@@ -1700,7 +1700,7 @@ export const useReportsStore = defineStore('reports', {
           limit: this.pagination.limit
         }
         
-        const { data, meta } = await get('/reports', params)
+        const { data, meta } = await get('/api/v1/reports', params)
         
         if (params.page === 1) {
           this.reports = data
@@ -1740,7 +1740,7 @@ export const useReportsStore = defineStore('reports', {
     async createReport(reportData: CreateReportDto) {
       try {
         const { post } = useApi()
-        const { data } = await post('/reports', reportData)
+        const { data } = await post('/api/v1/reports', reportData)
         
         this.reports.unshift(data)
         this.pagination.total++
@@ -1754,7 +1754,7 @@ export const useReportsStore = defineStore('reports', {
     async updateReport(id: string, updateData: Partial<Report>) {
       try {
         const { put } = useApi()
-        const { data } = await put(`/reports/${id}`, updateData)
+        const { data } = await put(`/api/v1/reports/${id}`, updateData)
         
         const index = this.reports.findIndex(r => r.id === id)
         if (index !== -1) {
@@ -1842,7 +1842,7 @@ export const useReportsStore = defineStore('reports', {
 
 ```bash
 # API Configuration
-API_BASE_URL=https://api.civactu.fr/api/v1
+API_BASE_URL=https://api.civactu.fr
 WS_URL=wss://api.civactu.fr
 
 # Map Services

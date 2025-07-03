@@ -1,202 +1,36 @@
-import type { ApiResponse, PaginatedResponse, ApiError, ApiQueryParams } from '~/types/api'
+import type { ApiResponse, PaginatedResponse, ApiQueryParams } from '~/types/api'
 
-// Composable pour les appels API
+// Composable simplifié qui utilise l'ApiClient global
 export const useApi = () => {
-  const config = useRuntimeConfig()
-  const baseURL = config.public.apiBase
+  const { $api } = useNuxtApp()
 
-  // Fonction utilitaire pour créer les headers
-  const createHeaders = (customHeaders: Record<string, string> = {}) => {
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      ...customHeaders
-    }
-
-    // Récupérer le token depuis le cookie
-    const token = useCookie('auth-token')
-    if (token.value) {
-      headers.Authorization = `Bearer ${token.value}`
-    }
-
-    return headers
-  }
-
-  // Fonction utilitaire pour construire l'URL avec les paramètres
-  const buildURL = (endpoint: string, params?: Record<string, any>): string => {
-    const url = new URL(endpoint, baseURL)
-    
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          if (Array.isArray(value)) {
-            value.forEach(v => url.searchParams.append(key, String(v)))
-          } else {
-            url.searchParams.set(key, String(value))
-          }
-        }
-      })
-    }
-    
-    return url.toString()
-  }
-
-  // Fonction utilitaire pour gérer les erreurs
-  const handleError = (error: any): ApiError => {
-    if (error.data && error.data.error) {
-      const apiError = new Error(error.data.error.message) as ApiError
-      apiError.code = error.data.error.code
-      apiError.status = error.status
-      apiError.response = error.data
-      return apiError
-    }
-    
-    const genericError = new Error(error.message || 'Une erreur est survenue') as ApiError
-    genericError.status = error.status
-    return genericError
-  }
-
-  // Méthodes HTTP
+  // Wrapper pour maintenir la compatibilité avec l'interface existante
   const get = async <T>(endpoint: string, params?: ApiQueryParams): Promise<ApiResponse<T>> => {
-    try {
-      const url = buildURL(endpoint, params)
-      const headers = createHeaders()
-
-      const response = await $fetch<ApiResponse<T>>(url, {
-        method: 'GET',
-        headers
-      })
-
-      return response
-    } catch (error: any) {
-      throw handleError(error)
-    }
+    return $api.get<ApiResponse<T>>(endpoint, params)
   }
 
   const post = async <T>(endpoint: string, data?: any): Promise<ApiResponse<T>> => {
-    try {
-      const url = buildURL(endpoint)
-      const headers = createHeaders()
-
-      const response = await $fetch<ApiResponse<T>>(url, {
-        method: 'POST',
-        headers,
-        body: data
-      })
-
-      return response
-    } catch (error: any) {
-      throw handleError(error)
-    }
+    return $api.post<ApiResponse<T>>(endpoint, data)
   }
 
   const put = async <T>(endpoint: string, data?: any): Promise<ApiResponse<T>> => {
-    try {
-      const url = buildURL(endpoint)
-      const headers = createHeaders()
-
-      const response = await $fetch<ApiResponse<T>>(url, {
-        method: 'PUT',
-        headers,
-        body: data
-      })
-
-      return response
-    } catch (error: any) {
-      throw handleError(error)
-    }
+    return $api.put<ApiResponse<T>>(endpoint, data)
   }
 
   const patch = async <T>(endpoint: string, data?: any): Promise<ApiResponse<T>> => {
-    try {
-      const url = buildURL(endpoint)
-      const headers = createHeaders()
-
-      const response = await $fetch<ApiResponse<T>>(url, {
-        method: 'PATCH',
-        headers,
-        body: data
-      })
-
-      return response
-    } catch (error: any) {
-      throw handleError(error)
-    }
+    return $api.patch<ApiResponse<T>>(endpoint, data)
   }
 
   const del = async <T>(endpoint: string): Promise<ApiResponse<T>> => {
-    try {
-      const url = buildURL(endpoint)
-      const headers = createHeaders()
-
-      const response = await $fetch<ApiResponse<T>>(url, {
-        method: 'DELETE',
-        headers
-      })
-
-      return response
-    } catch (error: any) {
-      throw handleError(error)
-    }
+    return $api.delete<ApiResponse<T>>(endpoint)
   }
 
-  // Upload de fichiers
   const upload = async <T>(
     endpoint: string, 
     file: File | Blob, 
     onProgress?: (progress: number) => void
   ): Promise<ApiResponse<T>> => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const formData = new FormData()
-        formData.append('file', file)
-
-        const url = buildURL(endpoint)
-        const headers = createHeaders()
-        delete headers['Content-Type'] // Laisser le navigateur définir le content-type pour FormData
-
-        // Utiliser XMLHttpRequest pour avoir le callback de progression
-        const xhr = new XMLHttpRequest()
-
-        xhr.upload.onprogress = (event) => {
-          if (event.lengthComputable && onProgress) {
-            const progress = (event.loaded / event.total) * 100
-            onProgress(progress)
-          }
-        }
-
-        xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            try {
-              const response = JSON.parse(xhr.responseText)
-              resolve(response)
-            } catch (error) {
-              reject(new Error('Erreur de parsing de la réponse'))
-            }
-          } else {
-            try {
-              const errorResponse = JSON.parse(xhr.responseText)
-              reject(handleError({ data: errorResponse, status: xhr.status }))
-            } catch {
-              reject(handleError({ message: `Erreur HTTP: ${xhr.status}`, status: xhr.status }))
-            }
-          }
-        }
-
-        xhr.onerror = () => reject(handleError({ message: 'Erreur de réseau' }))
-        xhr.ontimeout = () => reject(handleError({ message: 'Timeout de la requête' }))
-
-        xhr.open('POST', url)
-        
-        Object.entries(headers).forEach(([key, value]) => {
-          xhr.setRequestHeader(key, value)
-        })
-
-        xhr.send(formData)
-      } catch (error) {
-        reject(handleError(error))
-      }
-    })
+    return $api.upload<ApiResponse<T>>(endpoint, file, onProgress)
   }
 
   return {
@@ -206,7 +40,7 @@ export const useApi = () => {
     patch,
     delete: del,
     upload,
-    baseURL
+    baseURL: $api?.apiBaseURL
   }
 }
 

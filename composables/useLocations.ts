@@ -38,7 +38,7 @@ export const useLocations = () => {
   // Supprimer une région (admin seulement)
   const deleteRegion = async (id: string) => {
     try {
-      const response = await del(`/api/v1/locations/regions/${id}`)
+      const response = await del(`/locations/regions/${id}`)
       return response
     } catch (error) {
       throw error
@@ -70,7 +70,7 @@ export const useLocations = () => {
   // Obtenir une municipalité par son ID
   const getMunicipalityById = async (id: string) => {
     try {
-      const response = await get(`/api/v1/locations/municipalities/${id}`)
+      const response = await get(`/locations/municipalities/${id}`)
       return response
     } catch (error) {
       throw error
@@ -90,7 +90,7 @@ export const useLocations = () => {
   // Supprimer une municipalité (admin seulement)
   const deleteMunicipality = async (id: string) => {
     try {
-      const response = await del(`/api/v1/locations/municipalities/${id}`)
+      const response = await del(`/locations/municipalities/${id}`)
       return response
     } catch (error) {
       throw error

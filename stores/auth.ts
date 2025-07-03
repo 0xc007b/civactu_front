@@ -71,6 +71,7 @@ export const useAuthStore = defineStore('auth', {
           return { success: true }
         }
       } catch (error: any) {
+        console.error('Erreur de connexion:', error)
         this.loginAttempts++
         this.lastLoginAttempt = Date.now()
         
@@ -222,11 +223,12 @@ export const useAuthStore = defineStore('auth', {
       this.isAuthenticated = true
       this.isEmailVerified = user.isVerified
       
-      // Stocker le token dans un cookie sécurisé
-      const tokenCookie = useCookie('auth-token', {
+      // Stocker le token dans un cookie
+      const tokenCookie = useCookie<string | null>('auth-token', {
+        default: (): string | null => null,
         httpOnly: false,
-        secure: true,
-        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7 // 7 jours
       })
       tokenCookie.value = token
@@ -260,9 +262,15 @@ export const useAuthStore = defineStore('auth', {
           const { $api } = useNuxtApp()
           $api.setAuthToken(token)
           
-          const response = await $api.get<{ user: User }>('/api/v1/users/me')
+          // Utiliser l'endpoint correct pour récupérer l'utilisateur actuel
+          const response = await $api.get<{ success: boolean, data: User }>('/api/v1/users/me')
           
-          this.setAuth(response.user, token)
+          if (response.success && response.data) {
+            this.setAuth(response.data, token)
+          }
+           else {
+            this.clearAuth()
+          }
         } catch (error) {
           console.error('Erreur lors de l\'initialisation de l\'auth:', error)
           this.clearAuth()

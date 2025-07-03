@@ -229,7 +229,7 @@ export const useReportsStore = defineStore('reports', {
 
       try {
         const { $api } = useNuxtApp()
-        await $api.delete(`/api/v1/reports/${id}`)
+        await $api.delete(`/reports/${id}`)
 
         // Remove from list
         this.reports = this.reports.filter(r => r.id !== id)

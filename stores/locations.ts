@@ -147,7 +147,7 @@ export const useLocationsStore = defineStore('locations', {
           )
         })
 
-        const response = await $api.get<PaginatedResponse<Location>>('/locations', params)
+        const response = await $api.get<PaginatedResponse<Location>>('/api/v1/locations', params)
 
         if (page === 1 || refresh) {
           this.locations = response.data
@@ -180,7 +180,7 @@ export const useLocationsStore = defineStore('locations', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.get<ApiResponse<Location>>(`/locations/${id}`)
+        const response = await $api.get<ApiResponse<Location>>(`/api/v1/locations/${id}`)
         
         this.currentLocation = response.data
         this.cache.set(id, response.data)
@@ -200,7 +200,7 @@ export const useLocationsStore = defineStore('locations', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.get<ApiResponse<Location[]>>('/locations/search', { q: query, limit })
+        const response = await $api.get<ApiResponse<Location[]>>('/api/v1/locations/search', { q: query, limit })
         
         // Update cache
         response.data.forEach((location: Location) => {
@@ -227,7 +227,7 @@ export const useLocationsStore = defineStore('locations', {
           limit: limit.toString()
         })
 
-        const response = await $api.get<ApiResponse<Location[]>>('/locations/nearby', { latitude, longitude, radius })
+        const response = await $api.get<ApiResponse<Location[]>>('/api/v1/locations/nearby', { latitude, longitude, radius })
         
         this.nearbyLocations = response.data
         
@@ -251,7 +251,7 @@ export const useLocationsStore = defineStore('locations', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.post<ApiResponse<Location>>('/locations', locationData)
+        const response = await $api.post<ApiResponse<Location>>('/api/v1/locations', locationData)
 
         const newLocation = response.data
         this.locations.unshift(newLocation)
@@ -282,7 +282,7 @@ export const useLocationsStore = defineStore('locations', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.put<ApiResponse<Location>>(`/locations/${id}`, updateData)
+        const response = await $api.put<ApiResponse<Location>>(`/api/v1/locations/${id}`, updateData)
 
         const updatedLocation = response.data
         

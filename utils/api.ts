@@ -12,6 +12,40 @@ export class ApiClient {
     }
   }
 
+  // Getter public pour accéder au baseURL
+  get apiBaseURL(): string {
+    return this.baseURL
+  }
+
+  // Méthode pour récupérer automatiquement le token depuis les cookies
+  private getAuthToken(): string | null {
+    if (typeof window !== 'undefined') {
+      // Côté client, utiliser document.cookie
+      const cookies = document.cookie.split(';')
+      const authCookie = cookies.find(cookie => cookie.trim().startsWith('auth-token='))
+      if (authCookie) {
+        return authCookie.split('=')[1]
+      }
+    }
+    return null
+  }
+
+  // Méthode pour créer les headers avec le token automatique
+  private createHeaders(customHeaders: Record<string, string> = {}): Record<string, string> {
+    const headers = {
+      ...this.defaultHeaders,
+      ...customHeaders
+    }
+
+    // Récupérer automatiquement le token
+    const token = this.getAuthToken()
+    if (token) {
+      headers.Authorization = `Bearer ${token}`
+    }
+
+    return headers
+  }
+
   setAuthToken(token: string | null) {
     if (token) {
       this.defaultHeaders.Authorization = `Bearer ${token}`
@@ -76,10 +110,8 @@ export class ApiClient {
     
     const url = this.buildURL(endpoint, params)
     
-    const requestHeaders = {
-      ...this.defaultHeaders,
-      ...headers
-    }
+    // Utiliser la méthode createHeaders pour inclure automatiquement le token
+    const requestHeaders = this.createHeaders(headers)
 
     const requestBody = body ? JSON.stringify(body) : undefined
 
@@ -126,7 +158,8 @@ export class ApiClient {
     const formData = new FormData()
     formData.append('file', file)
 
-    const headers = { ...this.defaultHeaders }
+    // Utiliser createHeaders mais sans Content-Type pour FormData
+    const headers = this.createHeaders()
     delete headers['Content-Type'] // Let browser set it for FormData
 
     return new Promise((resolve, reject) => {

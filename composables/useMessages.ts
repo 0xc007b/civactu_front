@@ -27,7 +27,7 @@ export const useMessages = () => {
   // Obtenir un message par son ID
   const getMessageById = async (id: string) => {
     try {
-      const response = await get(`/api/v1/messages/${id}`)
+      const response = await get(`/messages/${id}`)
       return response
     } catch (error) {
       throw error
@@ -37,7 +37,7 @@ export const useMessages = () => {
   // Supprimer un message
   const deleteMessage = async (id: string) => {
     try {
-      const response = await del(`/api/v1/messages/${id}`)
+      const response = await del(`/messages/${id}`)
       return response
     } catch (error) {
       throw error
@@ -57,7 +57,7 @@ export const useMessages = () => {
   // Répondre à un message
   const replyToMessage = async (id: string, replyData: any) => {
     try {
-      const response = await post(`/api/v1/messages/${id}/reply`, replyData)
+      const response = await post(`/messages/${id}/reply`, replyData)
       return response
     } catch (error) {
       throw error

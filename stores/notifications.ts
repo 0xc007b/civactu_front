@@ -79,12 +79,9 @@ export const useNotificationsStore = defineStore('notifications', {
       try {
         const { $api } = useNuxtApp()
         
-        const response = await $api.get<PaginatedResponse<Notification>>('/notifications', {
+        const response = await $api.get<PaginatedResponse<Notification>>('/api/v1/notifications', {
           page,
           limit,
-          ...Object.fromEntries(
-            Object.entries(this.filters).filter(([_, value]) => value !== undefined && value !== '')
-          )
         })
 
         if (page === 1 || refresh) {
@@ -107,7 +104,7 @@ export const useNotificationsStore = defineStore('notifications', {
     async markAsRead(notificationId: string) {
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.get<ApiResponse<Notification>>(`/notifications/${notificationId}/read`, {
+        const response = await $api.get<ApiResponse<Notification>>(`/api/v1/notifications/${notificationId}/read`, {
           method: 'PATCH'
         })
 
@@ -134,7 +131,7 @@ export const useNotificationsStore = defineStore('notifications', {
 
       try {
         const { $api } = useNuxtApp()
-        await $api.patch('/notifications/mark-all-read', {})
+        await $api.patch('/api/v1/notifications/mark-all-read', {})
 
         // Update all notifications as read
         this.notifications.forEach(notification => {
@@ -224,7 +221,7 @@ export const useNotificationsStore = defineStore('notifications', {
     async fetchUnreadCount() {
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.get<ApiResponse<{ count: number }>>('/notifications/unread/count')
+        const response = await $api.get<ApiResponse<{ count: number }>>('/api/v1/notifications/unread/count')
         this.unreadCount = response.data.count
       } catch (error: any) {
         console.error('Error fetching unread count:', error)

@@ -27,7 +27,7 @@ export const useComments = () => {
   // Obtenir un commentaire par son ID
   const getCommentById = async (id: string) => {
     try {
-      const response = await get(`/api/v1/comments/${id}`)
+      const response = await get(`/comments/${id}`)
       return response
     } catch (error) {
       throw error
@@ -37,7 +37,7 @@ export const useComments = () => {
   // Mettre à jour un commentaire
   const updateComment = async (id: string, commentData: any) => {
     try {
-      const response = await patch(`/api/v1/comments/${id}`, commentData)
+      const response = await patch(`/comments/${id}`, commentData)
       return response
     } catch (error) {
       throw error
@@ -47,7 +47,7 @@ export const useComments = () => {
   // Supprimer un commentaire
   const deleteComment = async (id: string) => {
     try {
-      const response = await del(`/api/v1/comments/${id}`)
+      const response = await del(`/comments/${id}`)
       return response
     } catch (error) {
       throw error

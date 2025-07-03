@@ -101,7 +101,7 @@ export const useTagsStore = defineStore('tags', {
       try {
         const { $api } = useNuxtApp()
         
-        const response = await $api.get<PaginatedResponse<Tag>>('/api/v1/tags', {
+        const response = await $api.get<PaginatedResponse<Tag>>('/tags', {
           page,
           limit,
           ...Object.fromEntries(
@@ -134,7 +134,7 @@ export const useTagsStore = defineStore('tags', {
         // L'API ne semble pas avoir d'endpoint spécifique pour les tags populaires
         // Utilisons l'endpoint général et trions par usageCount
         const { $api } = useNuxtApp()
-        const response = await $api.get<{ data: Tag[] }>('/api/v1/tags')
+        const response = await $api.get<{ data: Tag[] }>('/tags')
         
         this.popularTags = response.data
           .sort((a, b) => (b.usageCount || 0) - (a.usageCount || 0))
@@ -160,7 +160,7 @@ export const useTagsStore = defineStore('tags', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.get<ApiResponse<Tag>>(`/api/v1/tags/${id}`)
+        const response = await $api.get<ApiResponse<Tag>>(`/tags/${id}`)
         
         this.currentTag = response.data
         this.cache.set(id, response.data)
@@ -198,7 +198,7 @@ export const useTagsStore = defineStore('tags', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.post<ApiResponse<Tag>>('/api/v1/tags', tagData)
+        const response = await $api.post<ApiResponse<Tag>>('/tags', tagData)
 
         const newTag = response.data
         this.tags.unshift(newTag)
@@ -229,7 +229,7 @@ export const useTagsStore = defineStore('tags', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.patch<ApiResponse<Tag>>(`/api/v1/tags/${id}`, updateData)
+        const response = await $api.patch<ApiResponse<Tag>>(`/tags/${id}`, updateData)
 
         const updatedTag = response.data
         
@@ -269,7 +269,7 @@ export const useTagsStore = defineStore('tags', {
 
       try {
         const { $api } = useNuxtApp()
-        await $api.delete(`/api/v1/tags/${id}`)
+        await $api.delete(`/tags/${id}`)
 
         // Remove from list
         this.tags = this.tags.filter(t => t.id !== id)

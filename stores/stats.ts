@@ -94,7 +94,7 @@ export const useStatsStore = defineStore('stats', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.get<ApiResponse<Stats>>('/stats/global')
+        const response = await $api.get<ApiResponse<Stats>>('/api/v1/stats/global')
         
         this.globalStats = response.data
         this.lastUpdated = new Date().toISOString()
@@ -117,7 +117,7 @@ export const useStatsStore = defineStore('stats', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.get<ApiResponse<Stats>>(`/stats/location/${locationId}`)
+        const response = await $api.get<ApiResponse<Stats>>(`/api/v1/stats/location/${locationId}`)
         
         this.locationStats[locationId] = response.data
         this.lastUpdated = new Date().toISOString()
@@ -141,7 +141,7 @@ export const useStatsStore = defineStore('stats', {
           user: Stats
           global: Stats
           locations: Record<string, Stats>
-        }>>('/stats/dashboard')
+        }>>('/api/v1/stats/dashboard')
         
         this.userStats = response.data.user
         this.globalStats = response.data.global
@@ -168,7 +168,7 @@ export const useStatsStore = defineStore('stats', {
         locationIds.forEach(id => params.append('locationIds', id))
         if (timeRange) params.set('timeRange', timeRange)
 
-        const response = await $api.get<ApiResponse<Record<string, Stats>>>(`/stats/compare?${params}`)
+        const response = await $api.get<ApiResponse<Record<string, Stats>>>(`/api/v1/stats/compare?${params}`)
         
         // Update location stats with fresh data
         Object.entries(response.data).forEach(([locationId, stats]) => {
@@ -197,7 +197,7 @@ export const useStatsStore = defineStore('stats', {
           users: Array<{ date: string; count: number }>
           comments: Array<{ date: string; count: number }>
           ratings: Array<{ date: string; average: number }>
-        }>>(`/stats/trending?timeRange=${timeRange}`)
+        }>>(`/api/v1/stats/trending?timeRange=${timeRange}`)
         
         return response.data
       } catch (error: any) {
@@ -216,7 +216,7 @@ export const useStatsStore = defineStore('stats', {
           username: string
           count: number
           rank: number
-        }>>>(`/stats/leaderboard/${category}?limit=${limit}`)
+        }>>>(`/api/v1/stats/leaderboard/${category}?limit=${limit}`)
         
         return response.data
       } catch (error: any) {

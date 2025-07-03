@@ -24,7 +24,7 @@ if (-not (Test-Path ".env.example")) {
     Write-Host "📄 Création du fichier .env.example..." -ForegroundColor Yellow
     @"
 # Configuration API
-API_BASE_URL=http://localhost:3001/api/v1
+API_BASE_URL=http://localhost:3001
 WS_URL=ws://localhost:3001
 
 # Configuration Mapbox (optionnel)
